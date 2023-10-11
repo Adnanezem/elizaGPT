@@ -75,6 +75,9 @@ public class JfxView {
         hBox.setAlignment(Pos.BASELINE_LEFT);
         dialog.getChildren().add(hBox);
         // TODO: a click on this hbox should delete the message.
+        hBox.setOnMouseClicked(e -> {
+            dialog.getChildren().remove(hBox);
+        });
     }
     
     private void sendMessage(final String text) {
@@ -100,6 +103,19 @@ public class JfxView {
             replyToUser("Bonjour " + matcher.group(1) + ".");
             return;
         }
+
+        //question 1 : réponse à une question
+        pattern = Pattern.compile(".*\\?$", Pattern.CASE_INSENSITIVE);
+        matcher = pattern.matcher(normalizedText);
+        if (matcher.matches()) {
+            final String myQuestion = processor.pickRandom(new String[] {
+                "Ici c'est moi qui pose les questions. ",
+                "Je vous renvoie la question.",
+            });
+            replyToUser(myQuestion);
+            return;
+        }
+
         pattern = Pattern.compile("Quel est mon nom \\?", Pattern.CASE_INSENSITIVE);
         matcher = pattern.matcher(normalizedText);
         if (matcher.matches()) {
@@ -128,6 +144,7 @@ public class JfxView {
             replyToUser(startQuestion + processor.firstToSecondPerson(matcher.group(1)) + " ?");
             return;
         }
+        
         // Nothing clever to say, answer randomly
         if (random.nextBoolean()) {
             replyToUser("Il faut beau aujourd'hui, vous ne trouvez pas ?");
@@ -196,7 +213,7 @@ public class JfxView {
         return input;
     }
 
-    private void searchText(final TextField text) {
+    private void searchTextbefore(final TextField text) {
         String currentSearchText = text.getText();
         if (currentSearchText == null) {
             searchTextLabel.setText("No active search");
@@ -213,6 +230,36 @@ public class JfxView {
                 }
             }
         }
+        dialog.getChildren().removeAll(toDelete);
+        text.setText("");
+    }
+
+     private void searchText(final TextField text) {
+        String currentSearchText = text.getText();
+        if (currentSearchText == ""){
+            searchTextLabel.setText("No active search");
+        }else {
+            searchTextLabel.setText("Searching for: " + currentSearchText);
+        }
+
+        Pattern pattern = Pattern.compile(currentSearchText, Pattern.CASE_INSENSITIVE);
+        
+        List<HBox> toDelete = new ArrayList<>();
+
+        for (Node hBox : dialog.getChildren()) {
+            for (Node label : ((HBox) hBox).getChildren()) {
+                String msg = ((Label) label).getText();
+                Matcher matcher = pattern.matcher(msg);
+
+                if(matcher.matches()){
+                    String result = matcher.group();
+                    System.out.println(result);
+                }else{
+                    toDelete.add((HBox) hBox);
+                }
+            }
+        }
+        
         dialog.getChildren().removeAll(toDelete);
         text.setText("");
     }
