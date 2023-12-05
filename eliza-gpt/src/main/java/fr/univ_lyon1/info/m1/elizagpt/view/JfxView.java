@@ -34,7 +34,7 @@ public class JfxView {
      * Create the main view of the application.
      */
         // TODO: style error in the following line. Check that checkstyle finds it, and then fix it.
-        public JfxView(final Stage stage, final int width, final int height){
+        public JfxView(final Stage stage, final int width, final int height) {
         stage.setTitle("Eliza GPT");
 
         final VBox root = new VBox(10);
@@ -236,9 +236,9 @@ public class JfxView {
 
      private void searchText(final TextField text) {
         String currentSearchText = text.getText();
-        if (currentSearchText == ""){
+        if (currentSearchText == "") {
             searchTextLabel.setText("No active search");
-        }else {
+        } else {
             searchTextLabel.setText("Searching for: " + currentSearchText);
         }
 
@@ -251,10 +251,10 @@ public class JfxView {
                 String msg = ((Label) label).getText();
                 Matcher matcher = pattern.matcher(msg);
 
-                if(matcher.matches()){
+                if (matcher.matches()) {
                     String result = matcher.group();
                     System.out.println(result);
-                }else{
+                } else {
                     toDelete.add((HBox) hBox);
                 }
             }
