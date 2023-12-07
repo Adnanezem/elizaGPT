@@ -1,21 +1,19 @@
 package fr.univ_lyon1.info.m1.elizagpt.controller;
 
+import fr.univ_lyon1.info.m1.elizagpt.MessageListener;
 import fr.univ_lyon1.info.m1.elizagpt.MessageNormalizerInterface;
 import fr.univ_lyon1.info.m1.elizagpt.MessageProcessorInterface;
-import fr.univ_lyon1.info.m1.elizagpt.MessageListener;
 import fr.univ_lyon1.info.m1.elizagpt.view.JfxView;
-import fr.univ_lyon1.info.m1.elizagpt.ControllerInterface;
 
-
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
  * Controller for the Eliza chatbot.
  */
-public class Controller implements MessageListener, ControllerInterface {
+public class Controller implements MessageListener {
     /**
      * The model of the application.
      */
@@ -76,7 +74,6 @@ public class Controller implements MessageListener, ControllerInterface {
      *
      * @param text The message to process.
      */
-    @Override
     public void processMessage(final String text) {
         String normalizedText = normalizer.normalize(text);
 

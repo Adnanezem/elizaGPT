@@ -1,8 +1,8 @@
 package fr.univ_lyon1.info.m1.elizagpt.view;
 
 import fr.univ_lyon1.info.m1.elizagpt.EventInterface;
-import fr.univ_lyon1.info.m1.elizagpt.MessageListener;
 import fr.univ_lyon1.info.m1.elizagpt.MyEventHandler;
+import fr.univ_lyon1.info.m1.elizagpt.MessageListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
