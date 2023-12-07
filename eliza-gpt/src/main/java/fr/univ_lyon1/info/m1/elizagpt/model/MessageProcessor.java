@@ -1,25 +1,62 @@
 package fr.univ_lyon1.info.m1.elizagpt.model;
 
-import java.util.Arrays;
+import fr.univ_lyon1.info.m1.elizagpt.MessageProcessorInterface;
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
+import javafx.scene.Node;
 import java.util.List;
 import java.util.Random;
+import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+
 
 /**
  * Logic to process a message (and probably reply to it).
  */
-public class MessageProcessor {
+public class MessageProcessor implements MessageProcessorInterface {
+    /** Random number generator. */
     private final Random random = new Random();
+
+
+
     /**
-     * Normlize the text: remove extra spaces, add a final dot if missing.
-     * @param text
-     * @return normalized text.
+     * Get the name of the user from the dialog.
+     * @param dialog The dialog.
+     * @return The name of the user, or null if not found.
      */
-    public String normalize(final String text) {
-        return text.replaceAll("\\s+", " ")
-                .replaceAll("^\\s+", "")
-                .replaceAll("\\s+$", "")
-                .replaceAll("[^\\.!?:]$", "$0.");
+    @Override
+    public String getName(final List<Node> dialog) {
+        for (Node hBox : dialog) {
+            for (Node label : ((HBox) hBox).getChildren()) {
+                if ("-fx-background-color: #A0E0A0;".equals(label.getStyle())) {
+                    String text = ((Label) label).getText();
+                    String name = getMatchedGroup(text);
+                    if (name != null) {
+                        return name;
+                    }
+                }
+            }
+        }
+        return null;
     }
+
+    /**
+     * get matched group from text and pattern.
+     *
+     * @param text text
+     * @return matched group
+     */
+    private String getMatchedGroup(final String text) {
+        Pattern p = Pattern.compile("Je m'appelle (.*)\\.", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = p.matcher(text);
+        if (matcher.matches()) {
+            return matcher.group(1);
+        }
+        return null;
+    }
+
 
     /**
      * Information about conjugation of a verb.
@@ -45,8 +82,9 @@ public class MessageProcessor {
     /**
      * List of 3rd group verbs and their correspondance from 1st person signular
      * (Je) to 2nd person plural (Vous).
+     * @see Verb
      */
-    protected static final List<Verb> VERBS = Arrays.asList(
+    public static final List<Verb> VERBS = Arrays.asList(
             new Verb("suis", "êtes"),
             new Verb("vais", "allez"),
             new Verb("dis", "dites"),
@@ -57,36 +95,15 @@ public class MessageProcessor {
             //new Verb("pense","pensez"),
             new Verb("peux", "pouvez")
             );
-            
 
-    /**
-     * Turn a 1st-person sentence (Je ...) into a plural 2nd person (Vous ...).
-     * The result is not capitalized to allow forming a new sentence.
-     *
-     * TODO: does not deal with all 3rd group verbs.
-     *
-     * @param text
-     * @return The 2nd-person sentence.
-     */
-    public String firstToSecondPerson(final String text) {
-        String processedText = text
-                .replaceAll("[Jj]e ([a-z]*)e ", "vous $1ez ");
-        for (Verb v : VERBS) {
-            processedText = processedText.replaceAll(
-                    "[Jj]e " + v.getFirstSingular(),
-                    "vous " + v.getSecondPlural());
-        }
-        processedText = processedText
-                .replaceAll("[Jj]e ([a-z]*)s ", "vous $1ssez ")
-                .replace("mon ", "votre ")
-                .replace("ma ", "votre ")
-                .replace("mes ", "vos ")
-                .replace("moi", "vous");
-        return processedText;
-    }
 
-    /** Pick an element randomly in the array. */
+
+    /** Pick an element randomly in the array.
+     *  @param <T> The type of the array.
+     * */
+    @Override
     public <T> T pickRandom(final T[] array) {
         return array[random.nextInt(array.length)];
     }
+
 }
