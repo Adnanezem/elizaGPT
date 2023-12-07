@@ -1,5 +1,8 @@
 package fr.univ_lyon1.info.m1.elizagpt;
 
+/**
+ * Interface for a message listener.
+ */
 public interface MessageListener {
 
     /**
