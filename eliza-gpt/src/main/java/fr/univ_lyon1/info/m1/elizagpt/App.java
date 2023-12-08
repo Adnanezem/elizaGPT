@@ -21,14 +21,23 @@ public class App extends Application {
     @Override
     public void start(final Stage stage) throws Exception {
         //new JfxView(stage, 600, 600);
+
         MessageProcessor model = new MessageProcessor();
         MessageNormalizer normalizer = new MessageNormalizer();
+
         JfxView view = new JfxView(stage, WH, WH);
         Controller controller = new Controller(model, normalizer, view);
         view.addMessageListener(controller);
-        view.showStage();
+
         // Second view (uncomment to activate)
-        // new JfxView(new Stage(), 400, 400);
+        JfxView view2 = new JfxView(new Stage(), 400, 400);
+        Controller controller2 = new Controller(model, normalizer, view2);
+        view2.addMessageListener(controller2);
+
+        view.showStage();
+        view2.showStage();
+
+
     }
 
 

@@ -4,7 +4,11 @@ import fr.univ_lyon1.info.m1.elizagpt.MessageListener;
 import fr.univ_lyon1.info.m1.elizagpt.MessageNormalizerInterface;
 import fr.univ_lyon1.info.m1.elizagpt.MessageProcessorInterface;
 import fr.univ_lyon1.info.m1.elizagpt.view.JfxView;
+import javafx.scene.control.Label;
+import javafx.scene.Node;
+import javafx.scene.layout.HBox;
 
+import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,7 +52,7 @@ public class Controller implements MessageListener {
 
     @Override
     public void onMessage(final String message) {
-        processMessage(message);
+        interpretAndRespond(message);
     }
 
     /**
@@ -60,21 +64,50 @@ public class Controller implements MessageListener {
         view.displayChatMessage(message);
     }
 
+
     /**
      * Get the name of the user from the dialog.
      *
      * @return The name of the user, or null if not found.
      */
     private String getName() {
-        return model.getName(view.getDialog());
+        List<Node> dialog = view.getDialog();
+        for (Node hBox : dialog) {
+            for (Node label : ((HBox) hBox).getChildren()) {
+                if ("-fx-background-color: #A0E0A0;".equals(label.getStyle())) {
+                    String text = ((Label) label).getText();
+                    String name = getMatchedGroup(text);
+                    if (name != null) {
+                        return name;
+                    }
+                }
+            }
+        }
+        return null;
     }
+
+/**
+ * get matched group from text and pattern.
+ *
+ * @param text text
+ * @return matched group
+ */
+    private String getMatchedGroup(final String text) {
+        Pattern p = Pattern.compile("Je m'appelle (.*)\\.", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = p.matcher(text);
+        if (matcher.matches()) {
+            return matcher.group(1);
+        }
+        return null;
+    }
+
 
     /**
      * Process a message from the user.
      *
      * @param text The message to process.
      */
-    public void processMessage(final String text) {
+    public void interpretAndRespond(final String text) {
         String normalizedText = normalizer.normalize(text);
 
         Pattern pattern;

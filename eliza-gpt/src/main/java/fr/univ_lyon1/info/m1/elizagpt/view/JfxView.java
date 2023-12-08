@@ -1,18 +1,17 @@
 package fr.univ_lyon1.info.m1.elizagpt.view;
 
 import fr.univ_lyon1.info.m1.elizagpt.EventInterface;
-import fr.univ_lyon1.info.m1.elizagpt.MyEventHandler;
 import fr.univ_lyon1.info.m1.elizagpt.MessageListener;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import fr.univ_lyon1.info.m1.elizagpt.MyEventHandler;
+import fr.univ_lyon1.info.m1.elizagpt.WidgetFactory;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -30,12 +29,13 @@ import java.util.regex.Pattern;
  */
 public class JfxView {
 
+    private  final WidgetFactory widgetFactory = new WidgetFactory();
     private VBox dialog;
     private final Stage stage;
     private List<Node> dialogOriginal;
     private boolean actualSearch;
     private TextField text = null;
-    private TextField searchText = null;
+    private TextField searchText;
 
     /**
      * The label that displays the current search.
@@ -78,7 +78,7 @@ public class JfxView {
         stage.setScene(new Scene(root, width, height));
         text.requestFocus();
         stage.show();
-        searchTextLabel = null;
+        searchTextLabel = new Label("No active search");
     }
 
 
@@ -136,6 +136,7 @@ public class JfxView {
     }
 
 
+
     /**
      * Create the search widget of the application.
      *
@@ -146,41 +147,16 @@ public class JfxView {
 
         HBox firstLine = new HBox();
         firstLine.setAlignment(Pos.BASELINE_LEFT);
-        searchText = createTextField(handler::onSearch);
+        searchText = widgetFactory.createTextField(handler::onSearch);
         firstLine.getChildren().add(searchText);
 
         HBox secondLine = new HBox();
         secondLine.setAlignment(Pos.BASELINE_LEFT);
-        secondLine.getChildren().addAll(createButton("Search",
+        secondLine.getChildren().addAll(widgetFactory.createButton("Search",
                                         handler::onSearch),
-                                        createButton("Undo search", handler::onUndo));
+                                        widgetFactory.createButton("Undo search", handler::onUndo));
 
         return new VBox(firstLine, secondLine);
-    }
-
-    /**
-     * Create a text field.
-     *
-     * @param event The event to trigger when the user presses enter.
-     * @return The text field.
-     */
-    private TextField createTextField(final EventHandler<ActionEvent> event) {
-        TextField textField = new TextField();
-        textField.setOnAction(event);
-        return textField;
-    }
-
-    /**
-     * Create a button.
-     *
-     * @param text  The text of the button.
-     * @param event The event to trigger when the user presses the button.
-     * @return The button.
-     */
-    private Button createButton(final String text, final EventHandler<ActionEvent> event) {
-        Button button = new Button(text);
-        button.setOnAction(event);
-        return button;
     }
 
 
@@ -204,7 +180,6 @@ public class JfxView {
             dialogOriginal = new ArrayList<>(dialog.getChildren());
             actualSearch = true;
         }
-
         searchTextLabel.setText("Searching for: " + currentSearchText);
 
         List<HBox> toDelete = new ArrayList<>();
@@ -247,13 +222,10 @@ public class JfxView {
      */
     private Pane createInputWidget() {
         final Pane input = new HBox();
-        text = new TextField();
-        Button send = new Button("Send");
-
         EventInterface handler = new MyEventHandler(this);
 
-        text.setOnAction(handler::onTextFieldEnter);
-        send.setOnAction(handler::onButtonClick);
+        text = widgetFactory.createTextField(handler::onTextFieldEnter);
+        Button send = widgetFactory.createButton("Send", handler::onButtonClick);
 
         input.getChildren().addAll(text, send);
         return input;
