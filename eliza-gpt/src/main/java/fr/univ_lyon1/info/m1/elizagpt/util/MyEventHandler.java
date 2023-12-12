@@ -19,10 +19,19 @@ public class MyEventHandler {
         this.view = view;
     }
 
+
+    /**
+     * Méthode pour l'evennement de la touche entrée.
+     * @param event l'événement
+     */
     public void onTextFieldEnter(final Object event) {
         processEvent();
     }
 
+    /**
+     * Méthode pour l'evennement du bouton.
+     * @param event l'événement
+     */
     public void onButtonClick(final Object event) {
         processEvent();
     }

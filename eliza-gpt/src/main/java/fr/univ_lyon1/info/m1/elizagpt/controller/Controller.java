@@ -48,7 +48,10 @@ public class Controller {
     }
 
 
-
+    /**
+     * a changer.
+     * @param message The message to interpret.
+     */
     public void onMessage(final String message) {
         interpretAndRespond(message);
     }

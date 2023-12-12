@@ -9,7 +9,7 @@ import java.util.Random;
 /**
  * Logic to process a message (and probably reply to it).
  */
-public class MessageProcessor{
+public class MessageProcessor {
     /** Random number generator. */
     private final Random random = new Random();
 
