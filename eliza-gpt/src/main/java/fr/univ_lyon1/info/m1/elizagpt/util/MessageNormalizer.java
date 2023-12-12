@@ -1,4 +1,4 @@
-package fr.univ_lyon1.info.m1.elizagpt;
+package fr.univ_lyon1.info.m1.elizagpt.util;
 
 
 import fr.univ_lyon1.info.m1.elizagpt.model.MessageProcessor;
@@ -6,7 +6,7 @@ import fr.univ_lyon1.info.m1.elizagpt.model.MessageProcessor;
 /**
  * Normalize the text.
  */
-public class MessageNormalizer implements MessageNormalizerInterface {
+public class MessageNormalizer {
 
     /**
      * Turn a 1st-person sentence (Je ...) into a plural 2nd person (Vous ...).
@@ -15,7 +15,7 @@ public class MessageNormalizer implements MessageNormalizerInterface {
      * @return The 2nd-person sentence.
      */
 
-    @Override
+
     public String firstToSecondPerson(final String text) {
         String processedText = text
                 .replaceAll("[Jj]e ([a-z]*)e ", "vous $1ez ");
@@ -39,7 +39,7 @@ public class MessageNormalizer implements MessageNormalizerInterface {
      * @param text text to normalize.
      * @return normalized text.
      */
-    @Override
+
     public String normalize(final String text) {
         return text.replaceAll("\\s+", " ")
                 .replaceAll("^\\s+", "")

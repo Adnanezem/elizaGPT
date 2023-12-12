@@ -1,4 +1,4 @@
-package fr.univ_lyon1.info.m1.elizagpt;
+package fr.univ_lyon1.info.m1.elizagpt.util;
 
 import javafx.event.EventHandler;
 import javafx.event.ActionEvent;

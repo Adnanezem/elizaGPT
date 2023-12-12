@@ -1,9 +1,7 @@
 package fr.univ_lyon1.info.m1.elizagpt.view;
 
-import fr.univ_lyon1.info.m1.elizagpt.EventInterface;
-import fr.univ_lyon1.info.m1.elizagpt.MessageListener;
-import fr.univ_lyon1.info.m1.elizagpt.MyEventHandler;
-import fr.univ_lyon1.info.m1.elizagpt.WidgetFactory;
+import fr.univ_lyon1.info.m1.elizagpt.util.MyEventHandler;
+import fr.univ_lyon1.info.m1.elizagpt.util.WidgetFactory;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -42,26 +40,6 @@ public class JfxView {
      */
     private final Label searchTextLabel;
 
-    private final List<MessageListener> messageListeners = new ArrayList<>();
-
-    /**
-     * Add a listener to the view.
-     *
-     * @param listener The listener to add.
-     */
-    public void addMessageListener(final MessageListener listener) {
-        messageListeners.add(listener);
-    }
-
-    /**
-     * Notify all the listeners that a message has been received.
-     * @param message The message.
-     */
-    public void notifyMessageListeners(final String message) {
-        for (MessageListener listener : messageListeners) {
-            listener.onMessage(message);
-        }
-    }
 
     /**
      * Create the main view of the application.
@@ -143,7 +121,7 @@ public class JfxView {
      * @return The search widget.
      */
     private Pane createSearchWidget() {
-        EventInterface handler = new MyEventHandler(this);
+        MyEventHandler handler = new MyEventHandler(this);
 
         HBox firstLine = new HBox();
         firstLine.setAlignment(Pos.BASELINE_LEFT);
@@ -222,7 +200,7 @@ public class JfxView {
      */
     private Pane createInputWidget() {
         final Pane input = new HBox();
-        EventInterface handler = new MyEventHandler(this);
+        MyEventHandler handler = new MyEventHandler(this);
 
         text = widgetFactory.createTextField(handler::onTextFieldEnter);
         Button send = widgetFactory.createButton("Send", handler::onButtonClick);

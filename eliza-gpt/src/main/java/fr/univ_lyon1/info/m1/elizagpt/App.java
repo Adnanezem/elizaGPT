@@ -1,6 +1,7 @@
 package fr.univ_lyon1.info.m1.elizagpt;
 
 import fr.univ_lyon1.info.m1.elizagpt.model.MessageProcessor;
+import fr.univ_lyon1.info.m1.elizagpt.util.MessageNormalizer;
 import fr.univ_lyon1.info.m1.elizagpt.view.JfxView;
 import fr.univ_lyon1.info.m1.elizagpt.controller.Controller;
 import javafx.application.Application;
@@ -27,12 +28,10 @@ public class App extends Application {
 
         JfxView view = new JfxView(stage, WH, WH);
         Controller controller = new Controller(model, normalizer, view);
-        view.addMessageListener(controller);
 
         // Second view (uncomment to activate)
         JfxView view2 = new JfxView(new Stage(), 400, 400);
         Controller controller2 = new Controller(model, normalizer, view2);
-        view2.addMessageListener(controller2);
 
         view.showStage();
         view2.showStage();

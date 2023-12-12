@@ -1,7 +1,5 @@
 package fr.univ_lyon1.info.m1.elizagpt.model;
 
-import fr.univ_lyon1.info.m1.elizagpt.MessageProcessorInterface;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -11,9 +9,11 @@ import java.util.Random;
 /**
  * Logic to process a message (and probably reply to it).
  */
-public class MessageProcessor implements MessageProcessorInterface {
+public class MessageProcessor{
     /** Random number generator. */
     private final Random random = new Random();
+
+
 
     /**
      * Information about conjugation of a verb.
@@ -58,7 +58,6 @@ public class MessageProcessor implements MessageProcessorInterface {
     /** Pick an element randomly in the array.
      *  @param <T> The type of the array.
      * */
-    @Override
     public <T> T pickRandom(final T[] array) {
         return array[random.nextInt(array.length)];
     }

@@ -1,8 +1,7 @@
 package fr.univ_lyon1.info.m1.elizagpt.controller;
 
-import fr.univ_lyon1.info.m1.elizagpt.MessageListener;
-import fr.univ_lyon1.info.m1.elizagpt.MessageNormalizerInterface;
-import fr.univ_lyon1.info.m1.elizagpt.MessageProcessorInterface;
+import fr.univ_lyon1.info.m1.elizagpt.model.MessageProcessor;
+import fr.univ_lyon1.info.m1.elizagpt.util.MessageNormalizer;
 import fr.univ_lyon1.info.m1.elizagpt.view.JfxView;
 import javafx.scene.control.Label;
 import javafx.scene.Node;
@@ -17,16 +16,16 @@ import java.util.regex.Pattern;
 /**
  * Controller for the Eliza chatbot.
  */
-public class Controller implements MessageListener {
+public class Controller {
     /**
      * The model of the application.
      */
-    private final MessageProcessorInterface model;
+    private final MessageProcessor model;
 
     /**
      * The normalizer of the application.
      */
-    private final MessageNormalizerInterface normalizer;
+    private final MessageNormalizer normalizer;
     /**
      * The view of the application.
      */
@@ -40,8 +39,8 @@ public class Controller implements MessageListener {
      * @param normalizer The normalizer of the application.
      * @param view       The view of the application.
      */
-    public Controller(final MessageProcessorInterface model,
-                      final MessageNormalizerInterface normalizer,
+    public Controller(final MessageProcessor model,
+                      final MessageNormalizer normalizer,
                       final JfxView view) {
         this.model = model;
         this.normalizer =  normalizer;
@@ -50,7 +49,6 @@ public class Controller implements MessageListener {
 
 
 
-    @Override
     public void onMessage(final String message) {
         interpretAndRespond(message);
     }
@@ -74,7 +72,7 @@ public class Controller implements MessageListener {
         List<Node> dialog = view.getDialog();
         for (Node hBox : dialog) {
             for (Node label : ((HBox) hBox).getChildren()) {
-                if ("-fx-background-color: #A0E0A0;".equals(label.getStyle())) {
+                if (label.getStyle().equals("-fx-background-color: #A0E0A0;")) {
                     String text = ((Label) label).getText();
                     String name = getMatchedGroup(text);
                     if (name != null) {
