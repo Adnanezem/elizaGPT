@@ -3,6 +3,7 @@ package fr.univ_lyon1.info.m1.elizagpt.view;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.univ_lyon1.info.m1.elizagpt.controller.Controller;
 import fr.univ_lyon1.info.m1.elizagpt.model.MessageProcessor;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -34,15 +35,17 @@ public class JfxView {
     private Label searchTextLabel = null;
     private MessageProcessor processor = new MessageProcessor();
     private final Random random = new Random();
+
+    private Controller controller;
     /**
      * Create the main view of the application.
      */
     // TODO: style error in the following line. Check that checkstyle finds it, and then fix it.
-    public JfxView(final Stage stage, final int width, final int height) {
+    public JfxView(Controller control,final Stage stage, final int width, final int height) {
         stage.setTitle("Eliza GPT");
 
         final VBox root = new VBox(10);
-
+        this.controller = control;
         final Pane search = createSearchWidget();
         root.getChildren().add(search);
 
@@ -193,11 +196,13 @@ public class JfxView {
         searchText = new TextField();
         searchText.setOnAction(e -> {
             searchText(searchText);
+            controller.performAction("onSearch");
         });
         firstLine.getChildren().add(searchText);
         final Button send = new Button("Search");
         send.setOnAction(e -> {
             searchText(searchText);
+            controller.performAction("onSearch");
         });
         searchTextLabel = new Label();
         final Button undo = new Button("Undo search");
