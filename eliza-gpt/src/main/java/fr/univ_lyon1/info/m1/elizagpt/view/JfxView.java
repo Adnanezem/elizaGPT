@@ -1,10 +1,10 @@
 package fr.univ_lyon1.info.m1.elizagpt.view;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import fr.univ_lyon1.info.m1.elizagpt.controller.Controller;
-import fr.univ_lyon1.info.m1.elizagpt.model.MessageProcessor;
+
+import fr.univ_lyon1.info.m1.elizagpt.model.Message;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -16,16 +16,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.Random;
-import java.util.regex.PatternSyntaxException;
-
 
 /**
  * Main class of the View (GUI) of the application.
  */
-public class JfxView {
+public class JfxView implements Observer {
     private final VBox dialog;
 
     private List<Node> dialogOriginal;
@@ -33,8 +28,8 @@ public class JfxView {
     private TextField text = null;
     private TextField searchText = null;
     private Label searchTextLabel = null;
-    private MessageProcessor processor = new MessageProcessor();
-    private final Random random = new Random();
+
+    private boolean actualSearch = false;
 
     private Controller controller;
     /**
@@ -120,8 +115,9 @@ public class JfxView {
         firstLine.getChildren().add(searchText);
         final Button send = new Button("Search");
         send.setOnAction(e -> {
-            searchText(searchText);
-            //controller.performAction("onSearch");
+            controller.performAction("onSearch", searchText.getText());
+            //searchText(searchText);
+            controller.getSearch().displaySearch();
         });
         searchTextLabel = new Label();
         final Button undo = new Button("Undo search");
@@ -134,43 +130,19 @@ public class JfxView {
     }
 
     private void searchText(final TextField text) {
-        String currentSearchText = text.getText();
-        if (currentSearchText.isEmpty()) {
-            searchTextLabel.setText("No active search");
+        if (text.getText().isEmpty()) {
+            text.setText("No search to perform");
             return;
         }
-
-        Pattern pattern;
-        try {
-            pattern = Pattern.compile(currentSearchText, Pattern.CASE_INSENSITIVE);
-        } catch (PatternSyntaxException e) {
-            searchTextLabel.setText("Invalid regular expression");
-            return;
-        }
-
-        // Store the original state of the dialog only if a search hasn't been performed
-        if (!actualsearch) {
-            dialogOriginal = new ArrayList<>(dialog.getChildren());
-            actualsearch = true;
-        }
-
-        searchTextLabel.setText("Searching for: " + currentSearchText);
-
-        List<HBox> toDelete = new ArrayList<>();
-
-        for (Node hBox : dialog.getChildren()) {
-            for (Node label : ((HBox) hBox).getChildren()) {
-                String msg = ((Label) label).getText();
-                Matcher matcher = pattern.matcher(msg);
-
-                if (!matcher.find()) {
-                    toDelete.add((HBox) hBox);
+        for (Message msg : controller.getSearch().getListSearch()) {
+            if (msg.getMessage().equals(text.getText())) {
+                if (msg.getAuthor().equals("Bot")) {
+                    displayChatMessage(msg.getMessage());
+                } else {
+                    displayUserMessage(msg.getMessage());
                 }
             }
         }
-
-        dialog.getChildren().removeAll(toDelete);
-        text.setText("");
     }
 
     private void undoSearch() {
@@ -192,6 +164,7 @@ public class JfxView {
             controller.performAction("textFieldEnter", text.getText());
             displayUserMessage(controller.getChat().getLastMessagesUser().getMessage());
             displayChatMessage(controller.getChat().getLastMessagesBot().getMessage());
+            text.setText("");
         });
 
         final Button send = new Button("Send");
@@ -201,6 +174,7 @@ public class JfxView {
             controller.performAction("onButtonClick", text.getText());
             displayUserMessage(controller.getChat().getLastMessagesUser().getMessage());
             displayChatMessage(controller.getChat().getLastMessagesBot().getMessage());
+            text.setText("");
         });
         input.getChildren().addAll(text, send);
         return input;
@@ -238,4 +212,33 @@ public class JfxView {
         displayMessage(text, ELIZA_STYLE, Pos.BASELINE_LEFT);
     }
 
+    /**
+     * Display une liste de message.
+     *
+     * @param list la liste de message
+     */
+    public void displayList(final List<Message> list) {
+        for (Message msg : list) {
+            if (msg.getAuthor().equals("Bot")) {
+                displayChatMessage(msg.getMessage());
+            } else {
+                displayUserMessage(msg.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Display a message from Eliza in the chat.
+     *
+     */
+    @Override
+    public void update() {
+        dialog.getChildren().clear();
+
+        if (!actualsearch) {
+            displayList(controller.getChat().getMessageList());
+        } else {
+            displayList(controller.getSearch().getListSearch());
+        }
+    }
 }

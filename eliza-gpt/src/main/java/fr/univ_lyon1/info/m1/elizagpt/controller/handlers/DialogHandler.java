@@ -35,7 +35,7 @@ public class DialogHandler implements Handler {
      */
     @Override
     public void handle(final String actionName, final String userChat) {
-        if (actionName.equals("textfieldEnter")) {
+        if (actionName.equals("textFieldEnter")) {
             handleValiderChat(userChat);
         } else if (actionName.equals("onButtonClick")) {
             handleValiderChat(userChat);
@@ -48,11 +48,12 @@ public class DialogHandler implements Handler {
      * Cette fonction traite l'action textfieldEnter et l'action onButtonClick.
      */
     private void handleValiderChat(final String userChat) {
-        System.out.println("Handling TextFieldEnter...");
+        System.out.println("Handling Dialog Action...");
         chat.addMessage(new Message("User", userChat));
-        //chat.DisplayChat();
+        //chat.displayChat();
+        Message lastMsgUser = chat.getLastMessagesUser();
         chat.addMessage(new Message("Bot",
-                chat.getLastMessagesUser().botResponse(chat.getName())));
+                lastMsgUser.botResponse(chat.getName())));
     }
 
 }

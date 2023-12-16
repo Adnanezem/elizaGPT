@@ -1,11 +1,26 @@
 package fr.univ_lyon1.info.m1.elizagpt.controller.handlers;
 
+import fr.univ_lyon1.info.m1.elizagpt.model.Chat;
+import fr.univ_lyon1.info.m1.elizagpt.model.Search;
+
 /**
  * Handler class.
  * Cette class définit le handler
  */
 public class SearchHandler implements Handler {
     private Handler nextHandler;
+    private Search search;
+    private Chat chat;
+
+    /**
+     * Constructeur de SearchHandler.
+     * @param search la recherche
+     * @param chat le chat
+     */
+    public SearchHandler(final Search search, final Chat chat) {
+        this.search = search;
+        this.chat = chat;
+    }
 
     /**
      * Cette fonction définit le prochain handler.
@@ -23,7 +38,7 @@ public class SearchHandler implements Handler {
     @Override
     public void handle(final String actionName, final String userChat) {
         if (actionName.equals("onSearch")) {
-            handleSearch();
+            handleSearch(userChat);
         } else if (actionName.equals("onUndo")) {
             handleUndo();
         } else if (nextHandler != null) {
@@ -34,8 +49,9 @@ public class SearchHandler implements Handler {
     /**
      * Cette fonction traite l'action onSearch.
      */
-    private void handleSearch() {
+    private void handleSearch(final String userChat) {
         System.out.println("Handling OnSearch...");
+        search.searchText(userChat, chat);
     }
 
     /**
@@ -43,5 +59,8 @@ public class SearchHandler implements Handler {
      */
     private void handleUndo() {
         System.out.println("Handling OnUndo...");
+        search.undoSearch();
     }
 }
+
+

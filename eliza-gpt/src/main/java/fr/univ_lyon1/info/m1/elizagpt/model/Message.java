@@ -14,6 +14,7 @@ public class Message {
 
     private String author;
     private String message;
+
     private final Random random = new Random();
 
     /**
@@ -63,16 +64,16 @@ public class Message {
     /**
      * Information about conjugation of a verb.
      */
-    protected static final List<MessageProcessor.Verb> VERBS = Arrays.asList(
-            new MessageProcessor.Verb("suis", "êtes"),
-            new MessageProcessor.Verb("vais", "allez"),
-            new MessageProcessor.Verb("dis", "dites"),
-            new MessageProcessor.Verb("ai", "avez"),
-            new MessageProcessor.Verb("fais", "faites"),
-            new MessageProcessor.Verb("sais", "savez"),
-            new MessageProcessor.Verb("dois", "devez"),
+    protected static final List<Verb> VERBS = Arrays.asList(
+            new Verb("suis", "êtes"),
+            new Verb("vais", "allez"),
+            new Verb("dis", "dites"),
+            new Verb("ai", "avez"),
+            new Verb("fais", "faites"),
+            new Verb("sais", "savez"),
+            new Verb("dois", "devez"),
             //new Verb("pense","pensez"),
-            new MessageProcessor.Verb("peux", "pouvez")
+            new Verb("peux", "pouvez")
     );
 
     /**
@@ -87,7 +88,7 @@ public class Message {
     public String firstToSecondPerson(final String text) {
         String processedText = text
                 .replaceAll("[Jj]e ([a-z]*)e ", "vous $1ez ");
-        for (MessageProcessor.Verb v : VERBS) {
+        for (Verb v : VERBS) {
             processedText = processedText.replaceAll(
                     "[Jj]e " + v.getFirstSingular(),
                     "vous " + v.getSecondPlural());

@@ -1,6 +1,4 @@
-package fr.univ_lyon1.info.m1.elizagpt;
-
-import fr.univ_lyon1.info.m1.elizagpt.model.Chat;
+package fr.univ_lyon1.info.m1.elizagpt.view;
 
 /**
  * Observer interface.
@@ -9,8 +7,7 @@ import fr.univ_lyon1.info.m1.elizagpt.model.Chat;
 public interface Observer {
     /**
      * Cette fonction met à jour le chat.
-     * @param chat le chat
      */
-    void update(Chat chat);
+    void update();
 
 }

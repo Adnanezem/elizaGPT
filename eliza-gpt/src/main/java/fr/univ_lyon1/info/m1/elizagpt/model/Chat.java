@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
  *  Chat class.
  *  Cette class définit un chat
  */
-public class Chat {
+public class Chat extends Observable {
 
     private List<Message> messageList;
     private String name;
@@ -31,8 +31,9 @@ public class Chat {
      * @param mesg le message
      */
     public void addMessage(final Message mesg) {
-        System.out.println("Adding message to chat");
+        System.out.println("Adding message : " + mesg.getMessage());
         messageList.add(mesg);
+        notifyObservers();
     }
 
     /**
@@ -41,6 +42,7 @@ public class Chat {
      */
     public void removeMessage(final int index) {
         messageList.remove(index);
+        notifyObservers();
     }
 
     /**
@@ -56,18 +58,22 @@ public class Chat {
      * @return le dernier message
      */
     public Message getLastMessagesBot() {
-        Message lastMessage = messageList.get(messageList.size() - 1);
-        //System.out.println(lastMessage.getAuthor());
-        int size = messageList.size();
+        if (!messageList.isEmpty()) {
+            Message lastMessage = messageList.get(messageList.size() - 1);
 
-        while (!(lastMessage.getAuthor().equals("Bot")) && size > 1) {
-            lastMessage = messageList.get(size - 2);
-            size--;
+            int size = messageList.size();
+
+            while (!(lastMessage.getAuthor().equals("Bot")) && size > 1) {
+                lastMessage = messageList.get(size - 2);
+                size--;
+            }
+            if (lastMessage.getAuthor().equals("Bot")) {
+                //System.out.println(lastMessage.getAuthor()+" : "+lastMessage.getMessage());
+                return lastMessage;
+            }
+            throw new RuntimeException("No bot message found");
         }
-        if (lastMessage.getAuthor().equals("Bot")) {
-            return lastMessage;
-        }
-        throw new RuntimeException("No Bot message found");
+        throw new RuntimeException("No message found");
     }
 
     /**
@@ -75,18 +81,22 @@ public class Chat {
      * @return le dernier message
      */
     public Message getLastMessagesUser() {
-        Message lastMessage = messageList.get(messageList.size() - 1);
-        //System.out.println(lastMessage.getAuthor());
-        int size = messageList.size();
+        if (!messageList.isEmpty()) {
+            Message lastMessage = messageList.get(messageList.size() - 1);
 
-        while (!(lastMessage.getAuthor().equals("User")) && size > 1) {
-            lastMessage = messageList.get(size - 2);
-            size--;
+            int size = messageList.size();
+
+            while (!(lastMessage.getAuthor().equals("User")) && size > 1) {
+                lastMessage = messageList.get(size - 2);
+                size--;
+            }
+            if (lastMessage.getAuthor().equals("User")) {
+                //System.out.println(lastMessage.getAuthor()+" : "+lastMessage.getMessage());
+                return lastMessage;
+            }
+            throw new RuntimeException("No user message found");
         }
-        if (lastMessage.getAuthor().equals("User")) {
-            return lastMessage;
-        }
-        throw new RuntimeException("No user message found");
+        throw new RuntimeException("No message found");
     }
 
     /**
