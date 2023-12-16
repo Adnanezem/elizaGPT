@@ -41,7 +41,7 @@ public class JfxView {
      * Create the main view of the application.
      */
     // TODO: style error in the following line. Check that checkstyle finds it, and then fix it.
-    public JfxView(Controller control,final Stage stage, final int width, final int height) {
+    public JfxView(final Controller control, final Stage stage, final int width, final int height) {
         stage.setTitle("Eliza GPT");
 
         final VBox root = new VBox(10);
@@ -93,6 +93,7 @@ public class JfxView {
 
     }
 
+
     private void sendMessage(final String text) {
         HBox hBox = new HBox();
         final Label label = new Label(text);
@@ -104,88 +105,6 @@ public class JfxView {
             dialog.getChildren().remove(hBox);
 
         });
-
-        String normalizedText = processor.normalize(text);
-
-        Pattern pattern;
-        Matcher matcher;
-
-        // First, try to answer specifically to what the user said
-        pattern = Pattern.compile(".*Je m'appelle (.*)\\.", Pattern.CASE_INSENSITIVE);
-        matcher = pattern.matcher(normalizedText);
-        if (matcher.matches()) {
-            replyToUser("Bonjour " + matcher.group(1) + ".");
-            return;
-        }
-        pattern = Pattern.compile("Quel est mon nom \\?", Pattern.CASE_INSENSITIVE);
-        matcher = pattern.matcher(normalizedText);
-        if (matcher.matches()) {
-            if (getName() != null) {
-                replyToUser("Votre nom est " + getName() + ".");
-            } else {
-                replyToUser("Je ne connais pas votre nom.");
-            }
-            return;
-        }
-        pattern = Pattern.compile("Qui est le plus (.*) \\?", Pattern.CASE_INSENSITIVE);
-        matcher = pattern.matcher(normalizedText);
-        if (matcher.matches()) {
-            replyToUser("Le plus " + matcher.group(1)
-                    + " est bien sûr votre enseignant de MIF01 !");
-            return;
-        }
-        pattern = Pattern.compile("(Je .*)\\.", Pattern.CASE_INSENSITIVE);
-        matcher = pattern.matcher(normalizedText);
-        if (matcher.matches()) {
-            final String startQuestion = processor.pickRandom(new String[] {
-                    "Pourquoi dites-vous que ",
-                    "Pourquoi pensez-vous que ",
-                    "Êtes-vous sûr que ",
-            });
-            replyToUser(startQuestion + processor.firstToSecondPerson(matcher.group(1)) + " ?");
-            return;
-        }
-        // Nothing clever to say, answer randomly
-        if (random.nextBoolean()) {
-            replyToUser("Il faut beau aujourd'hui, vous ne trouvez pas ?");
-            return;
-        }
-        if (random.nextBoolean()) {
-            replyToUser("Je ne comprends pas.");
-            return;
-        }
-        if (random.nextBoolean()) {
-            replyToUser("Hmmm, hmm ...");
-            return;
-        }
-        // Default answer
-        if (getName() != null) {
-            replyToUser("Qu'est-ce qui vous fait dire cela, " + getName() + " ?");
-        } else {
-            replyToUser("Qu'est-ce qui vous fait dire cela ?");
-        }
-    }
-
-    /**
-     * Extract the name of the user from the dialog.
-     * TODO: this totally breaks the MVC pattern, never, ever, EVER do that.
-     * @return
-     */
-    private String getName() {
-        for (Node hBox : dialog.getChildren()) {
-            for (Node label : ((HBox) hBox).getChildren()) {
-                if (((Label) label).getStyle().equals("-fx-background-color: #A0E0A0;")) {
-                    String text = ((Label) label).getText();
-                    Pattern pattern = Pattern.compile("Je m'appelle (.*)\\.",
-                            Pattern.CASE_INSENSITIVE);
-                    Matcher matcher = pattern.matcher(text);
-                    if (matcher.matches()) {
-                        return matcher.group(1);
-                    }
-                }
-            }
-        }
-        return null;
     }
 
     private Pane createSearchWidget() {
@@ -196,13 +115,13 @@ public class JfxView {
         searchText = new TextField();
         searchText.setOnAction(e -> {
             searchText(searchText);
-            controller.performAction("onSearch");
+            //controller.performAction("onSearch");
         });
         firstLine.getChildren().add(searchText);
         final Button send = new Button("Search");
         send.setOnAction(e -> {
             searchText(searchText);
-            controller.performAction("onSearch");
+            //controller.performAction("onSearch");
         });
         searchTextLabel = new Label();
         final Button undo = new Button("Undo search");
@@ -268,15 +187,55 @@ public class JfxView {
         final Pane input = new HBox();
         text = new TextField();
         text.setOnAction(e -> {
-            sendMessage(text.getText());
-            text.setText("");
+            //sendMessage(text.getText());
+            //text.setText("");
+            controller.performAction("textFieldEnter", text.getText());
+            displayUserMessage(controller.getChat().getLastMessagesUser().getMessage());
+            displayChatMessage(controller.getChat().getLastMessagesBot().getMessage());
         });
+
         final Button send = new Button("Send");
         send.setOnAction(e -> {
-            sendMessage(text.getText());
-            text.setText("");
+            //sendMessage(text.getText());
+            //text.setText("");
+            controller.performAction("onButtonClick", text.getText());
+            displayUserMessage(controller.getChat().getLastMessagesUser().getMessage());
+            displayChatMessage(controller.getChat().getLastMessagesBot().getMessage());
         });
         input.getChildren().addAll(text, send);
         return input;
     }
+
+    /**
+     * Display a message in the chat.
+     * @param text The message to display.
+     */
+    private void displayMessage(final String text, final String style, final Pos alignment) {
+        HBox hBox = new HBox();
+        final Label label = new Label(text);
+        hBox.getChildren().add(label);
+        label.setStyle(style);
+        hBox.setAlignment(alignment);
+        dialog.getChildren().add(hBox);
+        hBox.setOnMouseClicked(e -> dialog.getChildren().remove(hBox));
+    }
+
+    /**
+     * Display a message from the user in the chat.
+     *
+     * @param text The message to display.
+     */
+    public void displayUserMessage(final String text) {
+        displayMessage(text, USER_STYLE, Pos.BASELINE_RIGHT);
+    }
+
+    /**
+     * Display a message from Eliza in the chat.
+     *
+     * @param text The message to display.
+     */
+    public void displayChatMessage(final String text) {
+        displayMessage(text, ELIZA_STYLE, Pos.BASELINE_LEFT);
+    }
+
 }

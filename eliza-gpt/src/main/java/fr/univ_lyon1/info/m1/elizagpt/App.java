@@ -17,9 +17,9 @@ public class App extends Application {
     public void start(final Stage stage) throws Exception {
         Controller controller = new Controller();
 
-        new JfxView(controller,stage, 600, 600);
+        new JfxView(controller, stage, 600, 600);
         // Second view (uncomment to activate)
-         new JfxView(controller,new Stage(), 400, 400);
+         new JfxView(controller, new Stage(), 400, 400);
     }
 
 
