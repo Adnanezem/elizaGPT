@@ -27,8 +27,6 @@ public class JfxView implements Observer {
     private final VBox dialog;
     private TextField text = null;
     private TextField searchText = null;
-
-    private ComboBox<String> comboBox = null;
     private Label searchTextLabel = null;
     private Controller controller;
     /**
@@ -108,10 +106,12 @@ public class JfxView implements Observer {
             if (searchText.getText().isEmpty()) {
                 searchTextLabel.setText("No search to perform");
             } else {
-                if (comboBox.getValue().equals("subString")) {
+                if (comboBox.getValue().equals("SubString")) {
                     controller.performAction("onSearchSubString", searchText.getText());
-                } else {
+                } else if (comboBox.getValue().equals("Regex")) {
                     controller.performAction("onSearchRegex", searchText.getText());
+                } else if (comboBox.getValue().equals("Mot complet")) {
+                    controller.performAction("onSearchCompleteWord", searchText.getText());
                 }
                 searchTextLabel.setText("Search: " + searchText.getText());
                 searchText.setText("");
@@ -154,7 +154,7 @@ public class JfxView implements Observer {
         });
 
         final Button send = new Button("Send");
-        send.setStyle("-fx-background-color: green; ");
+        send.setStyle("-fx-background-color: #9adac3; ");
         send.setOnAction(e -> {
             controller.performAction("onButtonClick", text.getText());
             text.setText("");
@@ -182,7 +182,7 @@ public class JfxView implements Observer {
         });
 
         label.setStyle(style);
-        deleteButton.setStyle("-fx-background-color: brown; " + BASE_STYLE);
+        deleteButton.setStyle("-fx-background-color: #e081ef; " + BASE_STYLE);
         hBox.setAlignment(alignment);
         dialog.getChildren().addAll(hBox);
 

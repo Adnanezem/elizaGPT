@@ -1,5 +1,7 @@
 package fr.univ_lyon1.info.m1.elizagpt.model;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,17 +34,16 @@ class GoodbyeResponse implements ResponseStrategy {
         Pattern pattern = Pattern.compile("Au revoir.", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(normalizedText);
         if (matcher.matches()) {
-            String response;
             if (random.nextBoolean()) {
-                response = "Oh non, c'est trop triste de se quitter !";
+                return "Oh non, c'est trop triste de se quitter !";
             } else {
-                response = "Au revoir.";
+                if (name != null) {
+                    return "Au revoir " + name + ".";
+                } else {
+                    return "Au revoir.";
+                }
             }
-            if (name != null) {
-                return "Votre nom est " + name + ".";
-            } else {
-                return response;
-            }
+
         }
         return null;
     }
@@ -145,7 +146,72 @@ class ResponseNumberGame implements ResponseStrategy {
     }
 }
 
+/**
+ *  Message class.
+ *  Cette class définit une réponse à un message
+ */
+class ConjugaisonResponse implements ResponseStrategy {
+    private final Random random = new Random();
 
+    /**
+     * Information about conjugation of a verb.
+     */
+    protected static final List<Verb> VERBS = Arrays.asList(
+            new Verb("suis", "êtes"),
+            new Verb("vais", "allez"),
+            new Verb("dis", "dites"),
+            new Verb("ai", "avez"),
+            new Verb("fais", "faites"),
+            new Verb("sais", "savez"),
+            new Verb("dois", "devez"),
+            //new Verb("pense","pensez"),
+            new Verb("peux", "pouvez")
+    );
+    /**
+     * Turn a 1st-person sentence (Je ...) into a plural 2nd person (Vous ...).
+     * The result is not capitalized to allow forming a new sentence.
+     *
+     * TODO: does not deal with all 3rd group verbs.
+     *
+     * @param text
+     * @return The 2nd-person sentence.
+     */
+    public String firstToSecondPerson(final String text) {
+        String processedText = text
+                .replaceAll("[Jj]e ([a-z]*)e ", "vous $1ez ");
+        for (Verb v : VERBS) {
+            processedText = processedText.replaceAll(
+                    "[Jj]e " + v.getFirstSingular(),
+                    "vous " + v.getSecondPlural());
+        }
+        processedText = processedText
+                .replaceAll("[Jj]e ([a-z]*)s ", "vous $1ssez ")
+                .replace("mon ", "votre ")
+                .replace("ma ", "votre ")
+                .replace("mes ", "vos ")
+                .replace("moi", "vous");
+        return processedText;
+    }
+
+    /** Pick an element randomly in the array. */
+    public <T> T pickRandom(final T[] array) {
+        return array[random.nextInt(array.length)];
+    }
+
+    public String generateResponse(final String name, final String normalizedText) {
+        Pattern pattern = Pattern.compile("(Je .*)\\.", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(normalizedText);
+            if (matcher.matches()) {
+            final String startQuestion = pickRandom(new String[]{
+                    "Pourquoi dites-vous que ",
+                    "Pourquoi pensez-vous que ",
+                    "Êtes-vous sûr que ",
+            });
+            return startQuestion + firstToSecondPerson(matcher.group(1)) + " ?";
+        }
+        return null;
+    }
+}
 
 /**
  * Liste des stratégies de réponse.
@@ -153,6 +219,7 @@ class ResponseNumberGame implements ResponseStrategy {
 
 final class ResponseStrategies {
     private static final ArrayList<ResponseStrategy> RESPONSE_STRATEGIES = new ArrayList<>();
+    private String name;
 
     // Private constructor to prevent instantiation
     private ResponseStrategies() {
@@ -165,6 +232,7 @@ final class ResponseStrategies {
         RESPONSE_STRATEGIES.add(new WhoIsTheBestResponse());
         RESPONSE_STRATEGIES.add(new WhatMyNameResponse());
         RESPONSE_STRATEGIES.add(new ResponseNumberGame());
+        RESPONSE_STRATEGIES.add(new ConjugaisonResponse());
     }
 
     /**
@@ -174,6 +242,7 @@ final class ResponseStrategies {
     public static ArrayList<ResponseStrategy> getResponseStrategies() {
         return RESPONSE_STRATEGIES;
     }
+
 }
 
 

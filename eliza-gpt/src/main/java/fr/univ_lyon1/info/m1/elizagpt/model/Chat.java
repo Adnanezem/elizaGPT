@@ -12,18 +12,12 @@ import java.util.regex.Pattern;
 public class Chat extends Observable {
 
     private List<Message> messageList;
-    private String name;
 
     /**
      * Constructeur de la classe Chat.
      */
     public Chat() {
         this.messageList = new ArrayList<Message>();
-        this.name = null;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
     }
 
     /**
@@ -107,13 +101,14 @@ public class Chat extends Observable {
     public String getName() {
         for (Message msg : messageList) {
             if (msg.getAuthor().equals("User")) {
-                String text = msg.getMessage();
-                Pattern pattern = Pattern.compile("Je m'appelle (.*)\\.",
-                        Pattern.CASE_INSENSITIVE);
-                Matcher matcher = pattern.matcher(text);
+                String normalizedText = msg.normalize();
+
+                Pattern pattern = Pattern.compile("Je m'appelle (.*)", Pattern.CASE_INSENSITIVE);
+                Matcher matcher = pattern.matcher(normalizedText);
                 if (matcher.matches()) {
                     return matcher.group(1);
                 }
+
             }
         }
         return null;

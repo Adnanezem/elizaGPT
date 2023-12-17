@@ -1,11 +1,7 @@
 package fr.univ_lyon1.info.m1.elizagpt.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static fr.univ_lyon1.info.m1.elizagpt.model.ResponseStrategies.getResponseStrategies;
 
@@ -78,52 +74,6 @@ public class Message {
     }
 
     /**
-     * Information about conjugation of a verb.
-     */
-    protected static final List<Verb> VERBS = Arrays.asList(
-            new Verb("suis", "êtes"),
-            new Verb("vais", "allez"),
-            new Verb("dis", "dites"),
-            new Verb("ai", "avez"),
-            new Verb("fais", "faites"),
-            new Verb("sais", "savez"),
-            new Verb("dois", "devez"),
-            //new Verb("pense","pensez"),
-            new Verb("peux", "pouvez")
-    );
-
-    /**
-     * Turn a 1st-person sentence (Je ...) into a plural 2nd person (Vous ...).
-     * The result is not capitalized to allow forming a new sentence.
-     *
-     * TODO: does not deal with all 3rd group verbs.
-     *
-     * @param text
-     * @return The 2nd-person sentence.
-     */
-    public String firstToSecondPerson(final String text) {
-        String processedText = text
-                .replaceAll("[Jj]e ([a-z]*)e ", "vous $1ez ");
-        for (Verb v : VERBS) {
-            processedText = processedText.replaceAll(
-                    "[Jj]e " + v.getFirstSingular(),
-                    "vous " + v.getSecondPlural());
-        }
-        processedText = processedText
-                .replaceAll("[Jj]e ([a-z]*)s ", "vous $1ssez ")
-                .replace("mon ", "votre ")
-                .replace("ma ", "votre ")
-                .replace("mes ", "vos ")
-                .replace("moi", "vous");
-        return processedText;
-    }
-
-    /** Pick an element randomly in the array. */
-    public <T> T pickRandom(final T[] array) {
-        return array[random.nextInt(array.length)];
-    }
-
-    /**
      * Répondre à l'utilisateur.
      */
     public String botResponse(final String name) {
@@ -134,21 +84,6 @@ public class Message {
             if (response != null) {
                 return response;
             }
-        }
-
-
-        Pattern pattern;
-        Matcher matcher;
-
-        pattern = Pattern.compile("(Je .*)\\.", Pattern.CASE_INSENSITIVE);
-        matcher = pattern.matcher(normalizedText);
-        if (matcher.matches()) {
-            final String startQuestion = pickRandom(new String[]{
-                    "Pourquoi dites-vous que ",
-                    "Pourquoi pensez-vous que ",
-                    "Êtes-vous sûr que ",
-            });
-            return startQuestion + firstToSecondPerson(matcher.group(1)) + " ?";
         }
 
         // Nothing clever to say, answer randomly

@@ -57,6 +57,7 @@ public class DialogHandler implements Handler {
         search.setIsSearch(false);
         chat.addMessage(new Message("User", userChat));
         Message lastMsgUser = chat.getLastMessagesUser();
+        System.out.println(chat.getName());
         chat.addMessage(new Message("Bot",
                 lastMsgUser.botResponse(chat.getName())));
     }
