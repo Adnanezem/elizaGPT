@@ -80,8 +80,9 @@ public class JfxView implements Observer {
         ObservableList<String> list; // Création de l'ObservableList
         list = FXCollections.observableArrayList();
 
-        list.add("subString");
-        list.add("regex");
+        list.add("SubString");
+        list.add("Regex");
+        list.add("Mot complet");
 
         comboBox.setItems(list);
         comboBox.getSelectionModel().select(1);
@@ -89,10 +90,12 @@ public class JfxView implements Observer {
             if (searchText.getText().isEmpty()) {
                 searchTextLabel.setText("No search to perform");
             } else {
-                if (comboBox.getValue().equals("subString")) {
+                if (comboBox.getValue().equals("SubString")) {
                     controller.performAction("onSearchSubString", searchText.getText());
-                } else {
+                } else if (comboBox.getValue().equals("Regex")) {
                     controller.performAction("onSearchRegex", searchText.getText());
+                } else if (comboBox.getValue().equals("Mot complet")) {
+                    controller.performAction("onSearchCompleteWord", searchText.getText());
                 }
                 searchTextLabel.setText("Search: " + searchText.getText());
                 searchText.setText("");

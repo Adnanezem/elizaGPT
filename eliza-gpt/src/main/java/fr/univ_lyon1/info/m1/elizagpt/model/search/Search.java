@@ -58,17 +58,11 @@ public class Search extends Observable {
     }
 
     /**
-     * fonction qui recherche un texte dans un chat.
+     * fonction qui recherche un avec la strategy regex dans un chat.
      * @param currentSearchText le texte à rechercher
      * @param chat le chat
      */
-    public void searchText(final String currentSearchText, final String strategy, final Chat chat) {
-        if (strategy.equals("regexStrategy")) {
-            searchStrategy = new RegexSearchStrategy();
-        } else if (strategy.equals("subStringStrategy")) {
-            searchStrategy = new SubstringSearchStrategy();
-        }
-
+    public void searchText(final String currentSearchText, final Chat chat) {
         if (!searchList.isEmpty()) {
             searchList.clear();
         }
@@ -80,6 +74,8 @@ public class Search extends Observable {
         searchStrategy.search(chat.getMessageList(), searchList, currentSearchText);
         notifyObservers();
     }
+
+
 
     /**
      * fonction qui annule la recherche.
@@ -98,4 +94,5 @@ public class Search extends Observable {
             System.out.println(msg.getMessage());
         }
     }
+
 }

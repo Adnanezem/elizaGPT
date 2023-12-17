@@ -1,7 +1,10 @@
 package fr.univ_lyon1.info.m1.elizagpt.controller.handlers;
 
 import fr.univ_lyon1.info.m1.elizagpt.model.Chat;
+import fr.univ_lyon1.info.m1.elizagpt.model.search.CompleteWordSearchStrategy;
+import fr.univ_lyon1.info.m1.elizagpt.model.search.RegexSearchStrategy;
 import fr.univ_lyon1.info.m1.elizagpt.model.search.Search;
+import fr.univ_lyon1.info.m1.elizagpt.model.search.SubstringSearchStrategy;
 
 /**
  * Handler class.
@@ -38,9 +41,11 @@ public class SearchHandler implements Handler {
     @Override
     public void handle(final String actionName, final String userChat) {
         if (actionName.equals("onSearchRegex")) {
-            handleSearch(userChat, "regexStrategy");
+            handleSearchRegex(userChat);
         } else if (actionName.equals("onSearchSubString")) {
-            handleSearch(userChat, "subStringStrategy");
+            handleSearchsubString(userChat);
+        } else if (actionName.equals("onSearchCompleteWord")) {
+            handleSearchCompleteWord(userChat);
         } else if (actionName.equals("onUndo")) {
             handleUndo();
         } else if (nextHandler != null) {
@@ -49,12 +54,30 @@ public class SearchHandler implements Handler {
     }
 
     /**
-     * Cette fonction traite l'action onSearch.
+     * Cette fonction traite l'action onSearchRegex.
      */
-    private void handleSearch(final String userChat, final String strategy) {
-        System.out.println("Handling OnSearch " + strategy);
+    private void handleSearchRegex(final String userChat) {
+        System.out.println("Handling OnSearchRegex...");
         search.setIsSearch(true);
-        search.searchText(userChat, strategy, chat);
+        search.setSearchStrategy(new RegexSearchStrategy());
+        search.searchText(userChat, chat);
+    }
+
+    /**
+     * Cette fonction traite l'action onSearchsubstring.
+     */
+    private void handleSearchsubString(final String userChat) {
+        System.out.println("Handling OnSearchRegex...");
+        search.setIsSearch(true);
+        search.setSearchStrategy(new SubstringSearchStrategy());
+        search.searchText(userChat, chat);
+    }
+
+    private void handleSearchCompleteWord(final String userChat) {
+        System.out.println("Handling OnSearchRegex...");
+        search.setIsSearch(true);
+        search.setSearchStrategy(new CompleteWordSearchStrategy());
+        search.searchText(userChat, chat);
     }
 
     /**
