@@ -16,13 +16,15 @@ public class RegexSearchStrategy implements SearchStrategy {
     public void search(final List<Message> list,
                         final List<Message> results,
                         final String pattern) {
-
-        Pattern regex = Pattern.compile(".*" + pattern + ".*");
-        for (Message msg : list) {
-            Matcher matcher = regex.matcher(msg.getMessage());
-            if (matcher.find()) {
-                results.add(msg); // Ajoute la sous-chaîne trouvée à la liste des résultats
+        if (!pattern.isEmpty() && pattern != null) {
+            Pattern regex = Pattern.compile(".*" + pattern + ".*");
+            for (Message msg : list) {
+                Matcher matcher = regex.matcher(msg.getMessage());
+                if (matcher.find()) {
+                    results.add(msg); // Ajoute la sous-chaîne trouvée à la liste des résultats
+                }
             }
         }
+
     }
 }

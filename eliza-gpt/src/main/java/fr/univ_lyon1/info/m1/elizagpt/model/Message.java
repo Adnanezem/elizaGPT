@@ -1,9 +1,11 @@
 package fr.univ_lyon1.info.m1.elizagpt.model;
 
+import fr.univ_lyon1.info.m1.elizagpt.model.responseStrategy.ResponseStrategy;
+
 import java.util.ArrayList;
 import java.util.Random;
 
-import static fr.univ_lyon1.info.m1.elizagpt.model.ResponseStrategies.getResponseStrategies;
+import static fr.univ_lyon1.info.m1.elizagpt.model.responseStrategy.ResponseStrategies.getResponseStrategies;
 
 /**
  *  Message class.
@@ -66,7 +68,6 @@ public class Message {
 
         // Check if the normalized text is an integer
         if (!normalized.matches("\\d+")) {
-            // If not, add a period at the end if there isn't one
             normalized = normalized.replaceAll("[^\\.!?:]$", "$0.");
         }
 

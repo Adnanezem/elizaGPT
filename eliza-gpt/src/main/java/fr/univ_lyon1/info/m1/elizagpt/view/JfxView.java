@@ -20,6 +20,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+
 /**
  * Main class of the View (GUI) of the application.
  */

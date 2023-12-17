@@ -26,7 +26,7 @@ public class Verb {
      * @param firstSingular le premier singulier
      * @param secondPlural le second pluriel
      */
-    Verb(final String firstSingular, final String secondPlural) {
+    public Verb(final String firstSingular, final String secondPlural) {
         this.firstSingular = firstSingular;
         this.secondPlural = secondPlural;
     }

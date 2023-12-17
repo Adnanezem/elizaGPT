@@ -67,7 +67,7 @@ public class Search extends Observable {
             searchList.clear();
         }
 
-        if (currentSearchText.isEmpty()) {
+        if (currentSearchText.isEmpty() && currentSearchText == null) {
             System.out.println("No active search");
         }
 

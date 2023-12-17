@@ -19,7 +19,8 @@ public class CompleteWordSearchStrategy implements SearchStrategy {
         Pattern p = Pattern.compile("\\b" + pattern + "\\b"); // \b pour les mots complets
         for (Message msg : list) {
             if (msg.getMessage().equals(pattern)) {
-                Matcher m = p.matcher(msg.getMessage());
+                String str = msg.normalize();
+                Matcher m = p.matcher(str);
                 if (m.find()) {
                     results.add(msg);
                 }
