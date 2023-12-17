@@ -1,4 +1,8 @@
-package fr.univ_lyon1.info.m1.elizagpt.model;
+package fr.univ_lyon1.info.m1.elizagpt.model.search;
+
+import fr.univ_lyon1.info.m1.elizagpt.model.Chat;
+import fr.univ_lyon1.info.m1.elizagpt.model.Message;
+import fr.univ_lyon1.info.m1.elizagpt.model.Observable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,12 +16,14 @@ import java.util.regex.PatternSyntaxException;
  */
 public class Search extends Observable {
     private List<Message> searchList;
+    private boolean isSearch;
 
     /**
      * Constructeur de la classe Search.
      */
     public Search() {
         this.searchList = new ArrayList<>();
+        this.isSearch = false;
     }
 
     /**
@@ -29,12 +35,27 @@ public class Search extends Observable {
     }
 
     /**
+     * Getter de la recherche.
+     * @return la recherche
+     */
+    public boolean getIsSearch() {
+        return isSearch;
+    }
+
+    /**
+     * Setter de la recherche.
+     * @param isSearch la recherche
+     */
+    public void setIsSearch(final boolean isSearch) {
+        this.isSearch = isSearch;
+    }
+
+    /**
      * fonction qui recherche un texte dans un chat.
      * @param currentSearchText le texte à rechercher
      * @param chat le chat
      */
     public void searchText(final String currentSearchText, final Chat chat) {
-
         if (!searchList.isEmpty()) {
             searchList.clear();
         }
@@ -67,6 +88,7 @@ public class Search extends Observable {
      */
     public void undoSearch() {
         searchList.clear();
+        isSearch = false;
         notifyObservers();
     }
 

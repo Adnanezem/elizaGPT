@@ -6,7 +6,6 @@ import fr.univ_lyon1.info.m1.elizagpt.controller.Controller;
 
 import fr.univ_lyon1.info.m1.elizagpt.model.Message;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -22,15 +21,9 @@ import javafx.stage.Stage;
  */
 public class JfxView implements Observer {
     private final VBox dialog;
-
-    private List<Node> dialogOriginal;
-    private boolean actualsearch;
     private TextField text = null;
     private TextField searchText = null;
     private Label searchTextLabel = null;
-
-    private boolean actualSearch = false;
-
     private Controller controller;
     /**
      * Create the main view of the application.
@@ -54,17 +47,15 @@ public class JfxView implements Observer {
         root.getChildren().add(dialogScroll);
         dialogScroll.setFitToWidth(true);
 
-
         final Pane input = createInputWidget();
         root.getChildren().add(input);
-        replyToUser("Bonjour");
-
 
         // Everything's ready: add it to the scene and display it
         final Scene scene = new Scene(root, width, height);
         stage.setScene(scene);
         text.requestFocus();
         stage.show();
+        update();
     }
 
     static final String BASE_STYLE = "-fx-padding: 8px; "
@@ -73,35 +64,6 @@ public class JfxView implements Observer {
     static final String USER_STYLE = "-fx-background-color: #A0E0A0; " + BASE_STYLE;
     static final String ELIZA_STYLE = "-fx-background-color: #A0A0E0; " + BASE_STYLE;
 
-    private void replyToUser(final String text) {
-        HBox hBox = new HBox();
-        final Label label = new Label(text);
-        hBox.getChildren().add(label);
-        label.setStyle(USER_STYLE);
-        hBox.setAlignment(Pos.BASELINE_LEFT);
-        dialog.getChildren().add(hBox);
-
-        hBox.setOnMouseClicked(e -> {
-            dialog.getChildren().remove(hBox);
-
-        });
-
-    }
-
-
-    private void sendMessage(final String text) {
-        HBox hBox = new HBox();
-        final Label label = new Label(text);
-        hBox.getChildren().add(label);
-        label.setStyle(ELIZA_STYLE);
-        hBox.setAlignment(Pos.BASELINE_RIGHT);
-        dialog.getChildren().add(hBox);
-        hBox.setOnMouseClicked(e -> {
-            dialog.getChildren().remove(hBox);
-
-        });
-    }
-
     private Pane createSearchWidget() {
         final HBox firstLine = new HBox();
         final HBox secondLine = new HBox();
@@ -109,19 +71,31 @@ public class JfxView implements Observer {
         secondLine.setAlignment(Pos.BASELINE_LEFT);
         searchText = new TextField();
         searchText.setOnAction(e -> {
-            searchText(searchText);
-            //controller.performAction("onSearch");
+            if (searchText.getText().isEmpty()) {
+                searchTextLabel.setText("No search to perform");
+            } else {
+                controller.performAction("onSearch", searchText.getText());
+                searchTextLabel.setText("Search: " + searchText.getText());
+                searchText.setText("");
+            }
         });
+
         firstLine.getChildren().add(searchText);
         final Button send = new Button("Search");
         send.setOnAction(e -> {
-            controller.performAction("onSearch", searchText.getText());
-            //searchText(searchText);
-            controller.getSearch().displaySearch();
+            if (searchText.getText().isEmpty()) {
+                searchTextLabel.setText("No search to perform");
+            } else {
+                controller.performAction("onSearch", searchText.getText());
+                searchTextLabel.setText("Search: " + searchText.getText());
+                searchText.setText("");
+            }
         });
         searchTextLabel = new Label();
         final Button undo = new Button("Undo search");
-        undo.setOnAction(e -> undoSearch());
+        undo.setOnAction(e -> {
+            controller.performAction("onUndo", searchText.getText());
+        });
 
         secondLine.getChildren().addAll(send, searchTextLabel, undo);
         final VBox input = new VBox();
@@ -145,35 +119,17 @@ public class JfxView implements Observer {
         }
     }
 
-    private void undoSearch() {
-        // Restore the original state of the dialog
-        if (actualsearch && dialogOriginal != null) {
-            dialog.getChildren().setAll(dialogOriginal);
-            actualsearch = false;
-            searchTextLabel.setText("Undo search");
-        } else {
-            searchTextLabel.setText("No search to undo");
-        }
-    }
     private Pane createInputWidget() {
         final Pane input = new HBox();
         text = new TextField();
         text.setOnAction(e -> {
-            //sendMessage(text.getText());
-            //text.setText("");
             controller.performAction("textFieldEnter", text.getText());
-            displayUserMessage(controller.getChat().getLastMessagesUser().getMessage());
-            displayChatMessage(controller.getChat().getLastMessagesBot().getMessage());
             text.setText("");
         });
 
         final Button send = new Button("Send");
         send.setOnAction(e -> {
-            //sendMessage(text.getText());
-            //text.setText("");
             controller.performAction("onButtonClick", text.getText());
-            displayUserMessage(controller.getChat().getLastMessagesUser().getMessage());
-            displayChatMessage(controller.getChat().getLastMessagesBot().getMessage());
             text.setText("");
         });
         input.getChildren().addAll(text, send);
@@ -191,7 +147,11 @@ public class JfxView implements Observer {
         label.setStyle(style);
         hBox.setAlignment(alignment);
         dialog.getChildren().add(hBox);
-        hBox.setOnMouseClicked(e -> dialog.getChildren().remove(hBox));
+        hBox.setOnMouseClicked(e -> {
+            int index = dialog.getChildren().indexOf(hBox);
+            controller.performAction("removeMessage", Integer.toString(index));
+            dialog.getChildren().remove(hBox);
+        });
     }
 
     /**
@@ -218,6 +178,7 @@ public class JfxView implements Observer {
      * @param list la liste de message
      */
     public void displayList(final List<Message> list) {
+
         for (Message msg : list) {
             if (msg.getAuthor().equals("Bot")) {
                 displayChatMessage(msg.getMessage());
@@ -235,10 +196,10 @@ public class JfxView implements Observer {
     public void update() {
         dialog.getChildren().clear();
 
-        if (!actualsearch) {
-            displayList(controller.getChat().getMessageList());
-        } else {
+        if (controller.getSearch().getIsSearch()) {
             displayList(controller.getSearch().getListSearch());
+        } else {
+            displayList(controller.getChat().getMessageList());
         }
     }
 }

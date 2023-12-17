@@ -1,7 +1,8 @@
 package fr.univ_lyon1.info.m1.elizagpt;
 
 import fr.univ_lyon1.info.m1.elizagpt.controller.Controller;
-import fr.univ_lyon1.info.m1.elizagpt.model.Observable;
+import fr.univ_lyon1.info.m1.elizagpt.model.Chat;
+import fr.univ_lyon1.info.m1.elizagpt.model.search.Search;
 import fr.univ_lyon1.info.m1.elizagpt.view.JfxView;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -16,12 +17,22 @@ public class App extends Application {
      */
     @Override
     public void start(final Stage stage) throws Exception {
-        Observable observable = new Observable();
-        Controller controller = new Controller();
+        Chat chat = new Chat();
+        Search search = new Search();
 
-        new JfxView(controller, stage, 600, 600);
+        Controller controller = new Controller(chat, search);
+
+        JfxView view = new JfxView(controller, stage, 600, 600);
         // Second view (uncomment to activate)
-        new JfxView(controller, new Stage(), 400, 400);
+        JfxView view2 = new JfxView(controller, new Stage(), 400, 400);
+
+        // Add the views as observers of the model
+        chat.addObserver(view);
+        chat.addObserver(view2);
+
+        search.addObserver(view);
+        search.addObserver(view2);
+
 
     }
 

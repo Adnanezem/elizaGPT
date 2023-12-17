@@ -1,7 +1,7 @@
 package fr.univ_lyon1.info.m1.elizagpt.controller.handlers;
 
 import fr.univ_lyon1.info.m1.elizagpt.model.Chat;
-import fr.univ_lyon1.info.m1.elizagpt.model.Search;
+import fr.univ_lyon1.info.m1.elizagpt.model.search.Search;
 
 /**
  * Handler class.
@@ -51,6 +51,7 @@ public class SearchHandler implements Handler {
      */
     private void handleSearch(final String userChat) {
         System.out.println("Handling OnSearch...");
+        search.setIsSearch(true);
         search.searchText(userChat, chat);
     }
 
@@ -60,6 +61,7 @@ public class SearchHandler implements Handler {
     private void handleUndo() {
         System.out.println("Handling OnUndo...");
         search.undoSearch();
+        search.setIsSearch(false);
     }
 }
 

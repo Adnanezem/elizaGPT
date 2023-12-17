@@ -2,6 +2,7 @@ package fr.univ_lyon1.info.m1.elizagpt.controller.handlers;
 
 import fr.univ_lyon1.info.m1.elizagpt.model.Chat;
 import fr.univ_lyon1.info.m1.elizagpt.model.Message;
+import fr.univ_lyon1.info.m1.elizagpt.model.search.Search;
 
 /**
  * DialogHandler class.
@@ -11,13 +12,15 @@ public class DialogHandler implements Handler {
 
     private Handler nextHandler;
     private Chat chat;
+    private Search search;
 
     /**
      * Constructeur de DialogHandler.
      * @param chat le chat
      */
-    public DialogHandler(final Chat chat) {
+    public DialogHandler(final Search search, final Chat chat) {
         this.chat = chat;
+        this.search = search;
     }
 
     /**
@@ -34,13 +37,15 @@ public class DialogHandler implements Handler {
      * @param actionName l'action à traité
      */
     @Override
-    public void handle(final String actionName, final String userChat) {
+    public void handle(final String actionName, final String str) {
         if (actionName.equals("textFieldEnter")) {
-            handleValiderChat(userChat);
+            handleValiderChat(str);
         } else if (actionName.equals("onButtonClick")) {
-            handleValiderChat(userChat);
+            handleValiderChat(str);
+        } else if (actionName.equals("removeMessage")) {
+            handleRemoveMessage(str);
         } else if (nextHandler != null) {
-            nextHandler.handle(actionName, userChat);
+            nextHandler.handle(actionName, str);
         }
     }
 
@@ -49,11 +54,19 @@ public class DialogHandler implements Handler {
      */
     private void handleValiderChat(final String userChat) {
         System.out.println("Handling Dialog Action...");
+        search.setIsSearch(false);
         chat.addMessage(new Message("User", userChat));
-        //chat.displayChat();
         Message lastMsgUser = chat.getLastMessagesUser();
         chat.addMessage(new Message("Bot",
                 lastMsgUser.botResponse(chat.getName())));
+    }
+
+    /**
+     * Cette fonction traite l'action removeMessage.
+     */
+    private void handleRemoveMessage(final String index) {
+        System.out.println("Remove Message " + index);
+        chat.removeMessage(Integer.parseInt(index));
     }
 
 }
