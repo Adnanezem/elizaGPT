@@ -1,50 +1,22 @@
-package fr.univ_lyon1.info.m1.elizagpt.model;
+package fr.univ_lyon1.info.m1.elizagpt.model.responseStrategy;
+
+import fr.univ_lyon1.info.m1.elizagpt.model.Verb;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * Logic to process a message (and probably reply to it).
+ *  Message class.
+ *  Cette class définit une réponse à un message
  */
-public class MessageProcessor {
+public class ConjugaisonResponse implements ResponseStrategy {
     private final Random random = new Random();
-    /**
-     * Normlize the text: remove extra spaces, add a final dot if missing.
-     * @param text
-     * @return normalized text.
-     */
-    public String normalize(final String text) {
-        return text.replaceAll("\\s+", " ")
-                .replaceAll("^\\s+", "")
-                .replaceAll("\\s+$", "")
-                .replaceAll("[^\\.!?:]$", "$0.");
-    }
 
     /**
      * Information about conjugation of a verb.
-     */
-    public static class Verb {
-        private final String firstSingular;
-        private final String secondPlural;
-
-        public String getFirstSingular() {
-            return firstSingular;
-        }
-
-        public String getSecondPlural() {
-            return secondPlural;
-        }
-
-        Verb(final String firstSingular, final String secondPlural) {
-            this.firstSingular = firstSingular;
-            this.secondPlural = secondPlural;
-        }
-    }
-
-    /**
-     * List of 3rd group verbs and their correspondance from 1st person signular
-     * (Je) to 2nd person plural (Vous).
      */
     protected static final List<Verb> VERBS = Arrays.asList(
             new Verb("suis", "êtes"),
@@ -56,9 +28,7 @@ public class MessageProcessor {
             new Verb("dois", "devez"),
             //new Verb("pense","pensez"),
             new Verb("peux", "pouvez")
-            );
-            
-
+    );
     /**
      * Turn a 1st-person sentence (Je ...) into a plural 2nd person (Vous ...).
      * The result is not capitalized to allow forming a new sentence.
@@ -88,5 +58,26 @@ public class MessageProcessor {
     /** Pick an element randomly in the array. */
     public <T> T pickRandom(final T[] array) {
         return array[random.nextInt(array.length)];
+    }
+
+
+    /**
+     * Génère une réponse à un message.
+     * @param name le nom de l'utilisateur
+     * @param normalizedText le message
+     * @return
+     */
+    public String generateResponse(final String name, final String normalizedText) {
+        Pattern pattern = Pattern.compile("(Je .*)\\.", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(normalizedText);
+        if (matcher.matches()) {
+            final String startQuestion = pickRandom(new String[]{
+                    "Pourquoi dites-vous que ",
+                    "Pourquoi pensez-vous que ",
+                    "Êtes-vous sûr que ",
+            });
+            return startQuestion + firstToSecondPerson(matcher.group(1)) + " ?";
+        }
+        return null;
     }
 }

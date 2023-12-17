@@ -1,13 +1,17 @@
 package fr.univ_lyon1.info.m1.elizagpt.view;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import fr.univ_lyon1.info.m1.elizagpt.model.MessageProcessor;
+import fr.univ_lyon1.info.m1.elizagpt.controller.Controller;
+
+import fr.univ_lyon1.info.m1.elizagpt.model.Message;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
+
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
@@ -15,34 +19,26 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.Random;
-import java.util.regex.PatternSyntaxException;
 
 
 /**
  * Main class of the View (GUI) of the application.
  */
-public class JfxView {
+public class JfxView implements Observer {
     private final VBox dialog;
-
-    private List<Node> dialogOriginal;
-    private boolean actualsearch;
     private TextField text = null;
     private TextField searchText = null;
     private Label searchTextLabel = null;
-    private MessageProcessor processor = new MessageProcessor();
-    private final Random random = new Random();
+    private Controller controller;
     /**
      * Create the main view of the application.
      */
     // TODO: style error in the following line. Check that checkstyle finds it, and then fix it.
-    public JfxView(final Stage stage, final int width, final int height) {
+    public JfxView(final Controller control, final Stage stage, final int width, final int height) {
         stage.setTitle("Eliza GPT");
 
         final VBox root = new VBox(10);
-
+        this.controller = control;
         final Pane search = createSearchWidget();
         root.getChildren().add(search);
 
@@ -56,17 +52,15 @@ public class JfxView {
         root.getChildren().add(dialogScroll);
         dialogScroll.setFitToWidth(true);
 
-
         final Pane input = createInputWidget();
         root.getChildren().add(input);
-        replyToUser("Bonjour");
-
 
         // Everything's ready: add it to the scene and display it
         final Scene scene = new Scene(root, width, height);
         stage.setScene(scene);
         text.requestFocus();
         stage.show();
+        update();
     }
 
     static final String BASE_STYLE = "-fx-padding: 8px; "
@@ -75,133 +69,60 @@ public class JfxView {
     static final String USER_STYLE = "-fx-background-color: #A0E0A0; " + BASE_STYLE;
     static final String ELIZA_STYLE = "-fx-background-color: #A0A0E0; " + BASE_STYLE;
 
-    private void replyToUser(final String text) {
-        HBox hBox = new HBox();
-        final Label label = new Label(text);
-        hBox.getChildren().add(label);
-        label.setStyle(USER_STYLE);
-        hBox.setAlignment(Pos.BASELINE_LEFT);
-        dialog.getChildren().add(hBox);
-
-        hBox.setOnMouseClicked(e -> {
-            dialog.getChildren().remove(hBox);
-
-        });
-
-    }
-
-    private void sendMessage(final String text) {
-        HBox hBox = new HBox();
-        final Label label = new Label(text);
-        hBox.getChildren().add(label);
-        label.setStyle(ELIZA_STYLE);
-        hBox.setAlignment(Pos.BASELINE_RIGHT);
-        dialog.getChildren().add(hBox);
-        hBox.setOnMouseClicked(e -> {
-            dialog.getChildren().remove(hBox);
-
-        });
-
-        String normalizedText = processor.normalize(text);
-
-        Pattern pattern;
-        Matcher matcher;
-
-        // First, try to answer specifically to what the user said
-        pattern = Pattern.compile(".*Je m'appelle (.*)\\.", Pattern.CASE_INSENSITIVE);
-        matcher = pattern.matcher(normalizedText);
-        if (matcher.matches()) {
-            replyToUser("Bonjour " + matcher.group(1) + ".");
-            return;
-        }
-        pattern = Pattern.compile("Quel est mon nom \\?", Pattern.CASE_INSENSITIVE);
-        matcher = pattern.matcher(normalizedText);
-        if (matcher.matches()) {
-            if (getName() != null) {
-                replyToUser("Votre nom est " + getName() + ".");
-            } else {
-                replyToUser("Je ne connais pas votre nom.");
-            }
-            return;
-        }
-        pattern = Pattern.compile("Qui est le plus (.*) \\?", Pattern.CASE_INSENSITIVE);
-        matcher = pattern.matcher(normalizedText);
-        if (matcher.matches()) {
-            replyToUser("Le plus " + matcher.group(1)
-                    + " est bien sûr votre enseignant de MIF01 !");
-            return;
-        }
-        pattern = Pattern.compile("(Je .*)\\.", Pattern.CASE_INSENSITIVE);
-        matcher = pattern.matcher(normalizedText);
-        if (matcher.matches()) {
-            final String startQuestion = processor.pickRandom(new String[] {
-                    "Pourquoi dites-vous que ",
-                    "Pourquoi pensez-vous que ",
-                    "Êtes-vous sûr que ",
-            });
-            replyToUser(startQuestion + processor.firstToSecondPerson(matcher.group(1)) + " ?");
-            return;
-        }
-        // Nothing clever to say, answer randomly
-        if (random.nextBoolean()) {
-            replyToUser("Il faut beau aujourd'hui, vous ne trouvez pas ?");
-            return;
-        }
-        if (random.nextBoolean()) {
-            replyToUser("Je ne comprends pas.");
-            return;
-        }
-        if (random.nextBoolean()) {
-            replyToUser("Hmmm, hmm ...");
-            return;
-        }
-        // Default answer
-        if (getName() != null) {
-            replyToUser("Qu'est-ce qui vous fait dire cela, " + getName() + " ?");
-        } else {
-            replyToUser("Qu'est-ce qui vous fait dire cela ?");
-        }
-    }
-
-    /**
-     * Extract the name of the user from the dialog.
-     * TODO: this totally breaks the MVC pattern, never, ever, EVER do that.
-     * @return
-     */
-    private String getName() {
-        for (Node hBox : dialog.getChildren()) {
-            for (Node label : ((HBox) hBox).getChildren()) {
-                if (((Label) label).getStyle().equals("-fx-background-color: #A0E0A0;")) {
-                    String text = ((Label) label).getText();
-                    Pattern pattern = Pattern.compile("Je m'appelle (.*)\\.",
-                            Pattern.CASE_INSENSITIVE);
-                    Matcher matcher = pattern.matcher(text);
-                    if (matcher.matches()) {
-                        return matcher.group(1);
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
     private Pane createSearchWidget() {
         final HBox firstLine = new HBox();
         final HBox secondLine = new HBox();
         firstLine.setAlignment(Pos.BASELINE_LEFT);
         secondLine.setAlignment(Pos.BASELINE_LEFT);
         searchText = new TextField();
+        ComboBox<String> comboBox = new ComboBox<>();
+        ObservableList<String> list; // Création de l'ObservableList
+        list = FXCollections.observableArrayList();
+
+        list.add("SubString");
+        list.add("Regex");
+        list.add("Mot complet");
+
+        comboBox.setItems(list);
+        comboBox.getSelectionModel().select(1);
         searchText.setOnAction(e -> {
-            searchText(searchText);
+            if (searchText.getText().isEmpty()) {
+                searchTextLabel.setText("No search to perform");
+            } else {
+                if (comboBox.getValue().equals("SubString")) {
+                    controller.performAction("onSearchSubString", searchText.getText());
+                } else if (comboBox.getValue().equals("Regex")) {
+                    controller.performAction("onSearchRegex", searchText.getText());
+                } else if (comboBox.getValue().equals("Mot complet")) {
+                    controller.performAction("onSearchCompleteWord", searchText.getText());
+                }
+                searchTextLabel.setText("Search: " + searchText.getText());
+                searchText.setText("");
+            }
         });
-        firstLine.getChildren().add(searchText);
+
+        firstLine.getChildren().addAll(searchText, comboBox);
         final Button send = new Button("Search");
         send.setOnAction(e -> {
-            searchText(searchText);
+            if (searchText.getText().isEmpty()) {
+                searchTextLabel.setText("No search to perform");
+            } else {
+                if (comboBox.getValue().equals("SubString")) {
+                    controller.performAction("onSearchSubString", searchText.getText());
+                } else if (comboBox.getValue().equals("Regex")) {
+                    controller.performAction("onSearchRegex", searchText.getText());
+                } else if (comboBox.getValue().equals("Mot complet")) {
+                    controller.performAction("onSearchCompleteWord", searchText.getText());
+                }
+                searchTextLabel.setText("Search: " + searchText.getText());
+                searchText.setText("");
+            }
         });
         searchTextLabel = new Label();
         final Button undo = new Button("Undo search");
-        undo.setOnAction(e -> undoSearch());
+        undo.setOnAction(e -> {
+            controller.performAction("onUndo", searchText.getText());
+        });
 
         secondLine.getChildren().addAll(send, searchTextLabel, undo);
         final VBox input = new VBox();
@@ -210,68 +131,110 @@ public class JfxView {
     }
 
     private void searchText(final TextField text) {
-        String currentSearchText = text.getText();
-        if (currentSearchText.isEmpty()) {
-            searchTextLabel.setText("No active search");
+        if (text.getText().isEmpty()) {
+            text.setText("No search to perform");
             return;
         }
-
-        Pattern pattern;
-        try {
-            pattern = Pattern.compile(currentSearchText, Pattern.CASE_INSENSITIVE);
-        } catch (PatternSyntaxException e) {
-            searchTextLabel.setText("Invalid regular expression");
-            return;
-        }
-
-        // Store the original state of the dialog only if a search hasn't been performed
-        if (!actualsearch) {
-            dialogOriginal = new ArrayList<>(dialog.getChildren());
-            actualsearch = true;
-        }
-
-        searchTextLabel.setText("Searching for: " + currentSearchText);
-
-        List<HBox> toDelete = new ArrayList<>();
-
-        for (Node hBox : dialog.getChildren()) {
-            for (Node label : ((HBox) hBox).getChildren()) {
-                String msg = ((Label) label).getText();
-                Matcher matcher = pattern.matcher(msg);
-
-                if (!matcher.find()) {
-                    toDelete.add((HBox) hBox);
+        for (Message msg : controller.getSearch().getListSearch()) {
+            if (msg.getMessage().equals(text.getText())) {
+                if (msg.getAuthor().equals("Bot")) {
+                    displayChatMessage(msg.getMessage());
+                } else {
+                    displayUserMessage(msg.getMessage());
                 }
             }
         }
-
-        dialog.getChildren().removeAll(toDelete);
-        text.setText("");
     }
 
-    private void undoSearch() {
-        // Restore the original state of the dialog
-        if (actualsearch && dialogOriginal != null) {
-            dialog.getChildren().setAll(dialogOriginal);
-            actualsearch = false;
-            searchTextLabel.setText("Undo search");
-        } else {
-            searchTextLabel.setText("No search to undo");
-        }
-    }
     private Pane createInputWidget() {
         final Pane input = new HBox();
         text = new TextField();
         text.setOnAction(e -> {
-            sendMessage(text.getText());
+            controller.performAction("textFieldEnter", text.getText());
             text.setText("");
         });
+
         final Button send = new Button("Send");
+        send.setStyle("-fx-background-color: #9adac3; ");
         send.setOnAction(e -> {
-            sendMessage(text.getText());
+            controller.performAction("onButtonClick", text.getText());
             text.setText("");
         });
         input.getChildren().addAll(text, send);
         return input;
+    }
+
+    /**
+     * Display a message in the chat.
+     * @param text The message to display.
+     */
+    private void displayMessage(final String text, final String style, final Pos alignment) {
+        HBox hBox = new HBox();
+        HBox hBoxDelete = new HBox();
+        Button deleteButton = new Button("x");
+        final Label label = new Label(text);
+        hBoxDelete.getChildren().addAll(label, deleteButton);
+        hBox.getChildren().add(hBoxDelete);
+
+
+        deleteButton.setOnAction(event -> {
+            int index = dialog.getChildren().indexOf(hBox);
+            controller.performAction("removeMessage", Integer.toString(index));
+        });
+
+        label.setStyle(style);
+        deleteButton.setStyle("-fx-background-color: #e081ef; " + BASE_STYLE);
+        hBox.setAlignment(alignment);
+        dialog.getChildren().addAll(hBox);
+
+    }
+
+    /**
+     * Display a message from the user in the chat.
+     *
+     * @param text The message to display.
+     */
+    public void displayUserMessage(final String text) {
+        displayMessage(text, USER_STYLE, Pos.BASELINE_RIGHT);
+    }
+
+    /**
+     * Display a message from Eliza in the chat.
+     *
+     * @param text The message to display.
+     */
+    public void displayChatMessage(final String text) {
+        displayMessage(text, ELIZA_STYLE, Pos.BASELINE_LEFT);
+    }
+
+    /**
+     * Display une liste de message.
+     *
+     * @param list la liste de message
+     */
+    public void displayList(final List<Message> list) {
+
+        for (Message msg : list) {
+            if (msg.getAuthor().equals("Bot")) {
+                displayChatMessage(msg.getMessage());
+            } else {
+                displayUserMessage(msg.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Display a message from Eliza in the chat.
+     *
+     */
+    @Override
+    public void update() {
+        dialog.getChildren().clear();
+
+        if (controller.getSearch().getIsSearch()) {
+            displayList(controller.getSearch().getListSearch());
+        } else {
+            displayList(controller.getChat().getMessageList());
+        }
     }
 }
