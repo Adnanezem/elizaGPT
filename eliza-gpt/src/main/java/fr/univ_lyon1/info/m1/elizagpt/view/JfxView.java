@@ -5,9 +5,13 @@ import java.util.List;
 import fr.univ_lyon1.info.m1.elizagpt.controller.Controller;
 
 import fr.univ_lyon1.info.m1.elizagpt.model.Message;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
@@ -23,6 +27,8 @@ public class JfxView implements Observer {
     private final VBox dialog;
     private TextField text = null;
     private TextField searchText = null;
+
+    private ComboBox<String> comboBox = null;
     private Label searchTextLabel = null;
     private Controller controller;
     /**
@@ -70,23 +76,40 @@ public class JfxView implements Observer {
         firstLine.setAlignment(Pos.BASELINE_LEFT);
         secondLine.setAlignment(Pos.BASELINE_LEFT);
         searchText = new TextField();
+        ComboBox<String> comboBox = new ComboBox<>();
+        ObservableList<String> list; // Création de l'ObservableList
+        list = FXCollections.observableArrayList();
+
+        list.add("subString");
+        list.add("regex");
+
+        comboBox.setItems(list);
+        comboBox.getSelectionModel().select(1);
         searchText.setOnAction(e -> {
             if (searchText.getText().isEmpty()) {
                 searchTextLabel.setText("No search to perform");
             } else {
-                controller.performAction("onSearch", searchText.getText());
+                if (comboBox.getValue().equals("subString")) {
+                    controller.performAction("onSearchSubString", searchText.getText());
+                } else {
+                    controller.performAction("onSearchRegex", searchText.getText());
+                }
                 searchTextLabel.setText("Search: " + searchText.getText());
                 searchText.setText("");
             }
         });
 
-        firstLine.getChildren().add(searchText);
+        firstLine.getChildren().addAll(searchText, comboBox);
         final Button send = new Button("Search");
         send.setOnAction(e -> {
             if (searchText.getText().isEmpty()) {
                 searchTextLabel.setText("No search to perform");
             } else {
-                controller.performAction("onSearch", searchText.getText());
+                if (comboBox.getValue().equals("subString")) {
+                    controller.performAction("onSearchSubString", searchText.getText());
+                } else {
+                    controller.performAction("onSearchRegex", searchText.getText());
+                }
                 searchTextLabel.setText("Search: " + searchText.getText());
                 searchText.setText("");
             }

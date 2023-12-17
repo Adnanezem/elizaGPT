@@ -6,9 +6,6 @@ import fr.univ_lyon1.info.m1.elizagpt.model.Observable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 /**
  *  Search class.
@@ -16,6 +13,7 @@ import java.util.regex.PatternSyntaxException;
  */
 public class Search extends Observable {
     private List<Message> searchList;
+    private SearchStrategy searchStrategy;
     private boolean isSearch;
 
     /**
@@ -23,6 +21,7 @@ public class Search extends Observable {
      */
     public Search() {
         this.searchList = new ArrayList<>();
+        this.searchStrategy = new RegexSearchStrategy();
         this.isSearch = false;
     }
 
@@ -51,11 +50,25 @@ public class Search extends Observable {
     }
 
     /**
+     * Setter de la stratégie de recherche.
+     * @param searchStrategy la stratégie de recherche
+     */
+    public void setSearchStrategy(final SearchStrategy searchStrategy) {
+        this.searchStrategy = searchStrategy;
+    }
+
+    /**
      * fonction qui recherche un texte dans un chat.
      * @param currentSearchText le texte à rechercher
      * @param chat le chat
      */
-    public void searchText(final String currentSearchText, final Chat chat) {
+    public void searchText(final String currentSearchText, final String strategy, final Chat chat) {
+        if (strategy.equals("regexStrategy")) {
+            searchStrategy = new RegexSearchStrategy();
+        } else if (strategy.equals("subStringStrategy")) {
+            searchStrategy = new SubstringSearchStrategy();
+        }
+
         if (!searchList.isEmpty()) {
             searchList.clear();
         }
@@ -64,22 +77,7 @@ public class Search extends Observable {
             System.out.println("No active search");
         }
 
-        Pattern pattern;
-        try {
-            pattern = Pattern.compile(currentSearchText, Pattern.CASE_INSENSITIVE);
-        } catch (PatternSyntaxException e) {
-            System.out.println("Invalid regular expression");
-            return;
-        }
-
-        for (Message msg : chat.getMessageList()) {
-            Matcher matcher = pattern.matcher(msg.getMessage());
-
-            if (matcher.find()) {
-                searchList.add(msg);
-            }
-
-        }
+        searchStrategy.search(chat.getMessageList(), searchList, currentSearchText);
         notifyObservers();
     }
 

@@ -37,8 +37,10 @@ public class SearchHandler implements Handler {
      */
     @Override
     public void handle(final String actionName, final String userChat) {
-        if (actionName.equals("onSearch")) {
-            handleSearch(userChat);
+        if (actionName.equals("onSearchRegex")) {
+            handleSearch(userChat, "regexStrategy");
+        } else if (actionName.equals("onSearchSubString")) {
+            handleSearch(userChat, "subStringStrategy");
         } else if (actionName.equals("onUndo")) {
             handleUndo();
         } else if (nextHandler != null) {
@@ -49,10 +51,10 @@ public class SearchHandler implements Handler {
     /**
      * Cette fonction traite l'action onSearch.
      */
-    private void handleSearch(final String userChat) {
-        System.out.println("Handling OnSearch...");
+    private void handleSearch(final String userChat, final String strategy) {
+        System.out.println("Handling OnSearch " + strategy);
         search.setIsSearch(true);
-        search.searchText(userChat, chat);
+        search.searchText(userChat, strategy, chat);
     }
 
     /**
