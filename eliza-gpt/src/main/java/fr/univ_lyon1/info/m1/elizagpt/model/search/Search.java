@@ -67,12 +67,12 @@ public class Search extends Observable {
             searchList.clear();
         }
 
-        if (currentSearchText.isEmpty() && currentSearchText == null) {
+        if (currentSearchText == null || currentSearchText.isEmpty()) {
             System.out.println("No active search");
+        } else {
+            searchStrategy.search(chat.getMessageList(), searchList, currentSearchText);
+            notifyObservers();
         }
-
-        searchStrategy.search(chat.getMessageList(), searchList, currentSearchText);
-        notifyObservers();
     }
 
 

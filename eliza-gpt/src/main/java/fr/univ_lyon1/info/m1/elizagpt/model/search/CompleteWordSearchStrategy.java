@@ -15,15 +15,18 @@ public class CompleteWordSearchStrategy implements SearchStrategy {
     public void search(final List<Message> list,
                        final List<Message> results,
                        final String pattern) {
-
-        Pattern p = Pattern.compile("\\b" + pattern + "\\b"); // \b pour les mots complets
-        for (Message msg : list) {
-            if (msg.getMessage().equals(pattern)) {
+        if (pattern == null || pattern.isEmpty()) {
+            System.out.println("CompleteWordSearchStrategy: pattern is null or empty");
+        } else {
+            System.out.println("CompleteWordSearchStrategy: pattern = " + pattern);
+            Pattern p = Pattern.compile("\\b" + pattern + "\\b"); // \b pour les mots complets
+            for (Message msg : list) {
                 String str = msg.normalize();
                 Matcher m = p.matcher(str);
                 if (m.find()) {
                     results.add(msg);
                 }
+
             }
         }
     }

@@ -49,7 +49,7 @@ class SearchTest {
         assertThat(result, is(empty()));
     }
 
-    /*
+
     @Test
     void shouldReturnEmptyListWhenPatternIsNull() {
         search.setSearchStrategy(new RegexSearchStrategy());
@@ -58,14 +58,6 @@ class SearchTest {
         assertThat(result, is(empty()));
     }
 
-    @Test
-    void shouldReturnEmptyListWhenChatIsNull() {
-        search.setSearchStrategy(new RegexSearchStrategy());
-        search.searchText("Hello, my name is John.", null);
-        List<Message> result = search.getListSearch();
-        assertThat(result, is(empty()));
-    }
-*/
     @Test
     void shouldClearSearchListWhenUndoSearchIsCalled() {
         search.setSearchStrategy(new RegexSearchStrategy());

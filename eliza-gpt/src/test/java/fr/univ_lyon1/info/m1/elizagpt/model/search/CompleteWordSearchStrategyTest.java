@@ -25,14 +25,12 @@ class CompleteWordSearchStrategyTest {
         list.add(new Message("User", "Goodbye my name is John."));
     }
 
-   /* @Test
+    @Test
     void shouldReturnCorrectMessageWhenPatternMatches() {
         completeWordSearchStrategy.search(list, results, "Hello");
         assertThat(results, hasSize(1));
         assertThat(results.get(0).getMessage(), is(equalTo("Hello my name is John.")));
     }
-
-    */
 
     @Test
     void shouldReturnEmptyListWhenPatternDoesNotMatch() {

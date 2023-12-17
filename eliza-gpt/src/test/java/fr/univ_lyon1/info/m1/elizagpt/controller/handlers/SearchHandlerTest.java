@@ -41,13 +41,13 @@ class SearchHandlerTest {
                 is(equalTo("Hello, my name is John.")));
     }
 
-    /*@Test
+    @Test
     void shouldHandleOnSearchCompleteWordAction() {
         chat.addMessage(new Message("User", "Bonjour Eliza"));
         searchHandler.handle("onSearchCompleteWord", "Bonjour");
         assertThat(search.getListSearch(), hasSize(1));
-        assertThat(search.getListSearch().get(0).getMessage(), is(equalTo("Bonjour")));
-    }*/
+        assertThat(search.getListSearch().get(0).getMessage(), is(equalTo("Bonjour Eliza")));
+    }
 
     @Test
     void shouldHandleOnUndoAction() {

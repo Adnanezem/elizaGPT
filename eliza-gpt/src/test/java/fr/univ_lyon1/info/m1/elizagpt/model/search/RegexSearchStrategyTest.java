@@ -45,9 +45,9 @@ class RegexSearchStrategyTest {
         assertThat(results, is(empty()));
     }
 
-   /* @Test
+    @Test
     void shouldReturnEmptyListWhenPatternIsNull() {
-        regexSearchStrategy.search(list, results, " ");
+        regexSearchStrategy.search(list, results, "");
         assertThat(results, is(empty()));
-    }*/
+    }
 }

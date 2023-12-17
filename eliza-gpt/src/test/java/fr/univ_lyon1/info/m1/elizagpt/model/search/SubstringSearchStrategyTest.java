@@ -46,9 +46,9 @@ class SubstringSearchStrategyTest {
         assertThat(results, is(empty()));
     }
 
-   /*@Test
+   @Test
     void shouldReturnEmptyListWhenSubstringIsNull() {
         substringSearchStrategy.search(list, results, null);
         assertThat(results, is(empty()));
-    }*/
+    }
 }

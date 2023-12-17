@@ -14,9 +14,14 @@ public class SubstringSearchStrategy implements SearchStrategy {
     public void search(final List<Message> list,
                        final List<Message> results,
                        final String pattern) {
-        for (Message msg : list) {
-            if (msg.getMessage().contains(pattern)) {
-                results.add(msg); // Ajoute la sous-chaîne trouvée à la liste des résultats
+
+        if (pattern == null || pattern.isEmpty()) {
+            System.out.println("SubstringSearchStrategy: pattern is null or empty");
+        } else {
+            for (Message msg : list) {
+                if (msg.getMessage().contains(pattern)) {
+                    results.add(msg); // Ajoute la sous-chaîne trouvée à la liste des résultats
+                }
             }
         }
     }

@@ -16,7 +16,8 @@ public class RegexSearchStrategy implements SearchStrategy {
     public void search(final List<Message> list,
                         final List<Message> results,
                         final String pattern) {
-        if (!pattern.isEmpty() && pattern != null) {
+
+        if (pattern != null && !pattern.isEmpty() && !pattern.isBlank()) {
             Pattern regex = Pattern.compile(".*" + pattern + ".*");
             for (Message msg : list) {
                 Matcher matcher = regex.matcher(msg.getMessage());
