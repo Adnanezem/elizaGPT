@@ -154,6 +154,7 @@ public class JfxView implements Observer {
         });
 
         final Button send = new Button("Send");
+        send.setStyle("-fx-background-color: green; ");
         send.setOnAction(e -> {
             controller.performAction("onButtonClick", text.getText());
             text.setText("");
@@ -168,16 +169,23 @@ public class JfxView implements Observer {
      */
     private void displayMessage(final String text, final String style, final Pos alignment) {
         HBox hBox = new HBox();
+        HBox hBoxDelete = new HBox();
+        Button deleteButton = new Button("x");
         final Label label = new Label(text);
-        hBox.getChildren().add(label);
-        label.setStyle(style);
-        hBox.setAlignment(alignment);
-        dialog.getChildren().add(hBox);
-        hBox.setOnMouseClicked(e -> {
+        hBoxDelete.getChildren().addAll(label, deleteButton);
+        hBox.getChildren().add(hBoxDelete);
+
+
+        deleteButton.setOnAction(event -> {
             int index = dialog.getChildren().indexOf(hBox);
             controller.performAction("removeMessage", Integer.toString(index));
-            dialog.getChildren().remove(hBox);
         });
+
+        label.setStyle(style);
+        deleteButton.setStyle("-fx-background-color: brown; " + BASE_STYLE);
+        hBox.setAlignment(alignment);
+        dialog.getChildren().addAll(hBox);
+
     }
 
     /**

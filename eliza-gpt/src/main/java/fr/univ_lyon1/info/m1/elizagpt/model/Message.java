@@ -1,16 +1,25 @@
 package fr.univ_lyon1.info.m1.elizagpt.model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static fr.univ_lyon1.info.m1.elizagpt.model.ResponseStrategies.getResponseStrategies;
+
 /**
  *  Message class.
  *  Cette class définit un message
  */
 public class Message {
+
+    /**
+     * Liste des stratégies de réponse.
+     */
+    private final ArrayList<ResponseStrategy> responseStrategies = getResponseStrategies();
+
 
     private String author;
     private String message;
@@ -55,10 +64,17 @@ public class Message {
      * @return normalized text.
      */
     public String normalize() {
-        return message.replaceAll("\\s+", " ")
+        String normalized = message.replaceAll("\\s+", " ")
                 .replaceAll("^\\s+", "")
-                .replaceAll("\\s+$", "")
-                .replaceAll("[^\\.!?:]$", "$0.");
+                .replaceAll("\\s+$", "");
+
+        // Check if the normalized text is an integer
+        if (!normalized.matches("\\d+")) {
+            // If not, add a period at the end if there isn't one
+            normalized = normalized.replaceAll("[^\\.!?:]$", "$0.");
+        }
+
+        return normalized;
     }
 
     /**
@@ -112,32 +128,17 @@ public class Message {
      */
     public String botResponse(final String name) {
         final String normalizedText = normalize();
-        Pattern pattern;
-        Matcher matcher;
 
-        // First, try to answer specifically to what the user said
-        pattern = Pattern.compile(".*Je m'appelle (.*)\\.", Pattern.CASE_INSENSITIVE);
-        matcher = pattern.matcher(normalizedText);
-        if (matcher.matches()) {
-            return "Bonjour " + matcher.group(1) + ".";
-        }
-
-        pattern = Pattern.compile("Quel est mon nom \\?", Pattern.CASE_INSENSITIVE);
-        matcher = pattern.matcher(normalizedText);
-        if (matcher.matches()) {
-            if (name != null) {
-                return "Votre nom est " + name + ".";
-            } else {
-                return "Je ne connais pas votre nom.";
+        for (ResponseStrategy strategy : responseStrategies) {
+            String response = strategy.generateResponse(name, normalizedText);
+            if (response != null) {
+                return response;
             }
         }
 
-        pattern = Pattern.compile("Qui est le plus (.*) \\?", Pattern.CASE_INSENSITIVE);
-        matcher = pattern.matcher(normalizedText);
-        if (matcher.matches()) {
-            return "Le plus " + matcher.group(1)
-                    + " est bien sûr votre enseignant de MIF01 !";
-        }
+
+        Pattern pattern;
+        Matcher matcher;
 
         pattern = Pattern.compile("(Je .*)\\.", Pattern.CASE_INSENSITIVE);
         matcher = pattern.matcher(normalizedText);
